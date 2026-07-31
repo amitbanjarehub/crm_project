@@ -1,0 +1,258 @@
+              Module	                                            Main features
+
+              Dashboard	                         Users, leads, clients, follow-ups aur conversion summary
+              User Management           	User create/edit, role assign, activate/deactivate
+              Role Management	                Role create/edit aur permission assignment
+              Permission Management	        System permissions ki master list
+              Lead Management           	Lead create, assign, status, source, priority, follow-up
+              Client Management	                Converted clients, contact details, documents, history
+              Follow-up Management	        Calls, meetings, WhatsApp, reminders, next follow-up
+              Task Management	                Task assign, due date, priority, completion
+              Notes & Activities	        Lead/client notes aur complete activity timeline
+              Reports                    	Lead report, conversion report, employee performance
+              Notifications	                Pending follow-ups, overdue tasks, assigned leads
+              Settings	                        Company details, lead status, source, system configuration
+              Audit Logs	                Kis user ne kya create, edit ya delete kiya
+
+
+            1.Basic CRM ke liye priority:
+
+               Dashboard
+               Users
+               Roles
+               Permissions
+               Leads
+               Clients
+               Follow-ups
+               Tasks
+               Reports
+               Settings
+               Audit Logs
+
+           2. Existing roles
+     
+               Super Admin
+               Admin
+               Manager
+               Sales Executive
+               User
+
+           3. Role-permission
+
+               Full = Complete access
+               Team = Apni team ka data
+               Own = Sirf apna assigned data
+               View = Sirf dekh sakta hai
+               No = Access nahi
+
+                Module	          Super Admin	      Admin	        Manager	            Sales Executive  	 User
+               Dashboard	   Full          	Full	        Team	             Own	         Own/View
+               Users	           Full	                Full*	        Team View	     No	                 No   
+               Roles	           Full          	View + Manage   Permissions	     No                  No
+               Permissions	   Full	                View	        No	             No                  No
+               Leads	           Full	                Full	        Team	             Own	         View assigned
+               Clients	           Full          	Full	        Team	             Own	         View assigned
+               Follow-ups          Full	                Full	        Team	             Own	         Own/View
+               Tasks	           Full	                Full	        Team	             Own	         Own
+               Reports	           Full	                Full	        Team	             Own report	         No
+               Settings	           Full          	Full	        View only	     No	                 No
+               Audit Logs	   Full	                View	        No	             No	                 No
+               Import/Export	   Full	                Full	        Export team	     No                  No
+
+            4. Manager
+                       dashboard.view
+                       dashboard.view_team_stats
+
+                       Manager ko sirf apni team ka:
+
+                           Total Team Leads
+                           Pending Follow-ups
+                           Converted Clients
+                           Overdue Tasks
+                           Team Performance
+
+           5. Sales Executive
+                        dashboard.view
+                        dashboard.view_own_stats
+
+                        Sirf:
+
+                            My Leads
+                            Today Follow-ups
+                            My Clients
+                            Pending Tasks
+                            My Conversion
+
+
+          6. User
+               dashboard.view
+               dashboard.view_own_stats
+
+                 User Management permissions
+
+                         users.view
+                         users.create
+                         users.edit
+                         users.delete
+                         users.assign_role
+                         users.activate
+                         users.deactivate
+                         users.reset_password
+
+           7.Lead Management features
+
+                Lead fields
+                     Lead Name
+                     Company Name
+                     Phone
+                     Email
+                     Source
+                     Status
+                     Priority
+                     Assigned User
+                     Expected Value
+                     Next Follow-up
+                     Created By
+                     Notes
+
+
+              Lead statuses
+                     New
+                     Contacted
+                     Interested
+                     Follow-up
+                     Qualified
+                     Proposal Sent
+                     Negotiation
+                     Won
+                     Lost
+                     Not Interested
+
+             Lead permissions
+                     leads.view
+                     leads.view_team
+                     leads.view_all
+                     leads.create
+                     leads.edit_own
+                     leads.edit_all
+                     leads.delete
+                     leads.assign
+                     leads.change_status
+                     leads.convert
+                     leads.import
+                     leads.export
+           
+              8. Client Management permissions
+
+                    clients.view
+                    clients.view_team
+                    clients.view_all
+                    clients.create
+                    clients.edit_own
+                    clients.edit_all
+                    clients.delete
+                    clients.assign
+                    clients.add_note
+                    clients.upload_document
+                    clients.export
+
+              9. Follow-up Management
+        
+                    Call
+                    WhatsApp
+                    Email
+                    Meeting
+                    Demo
+                    Proposal
+                    Reminder
+
+             10. Task Management
+
+
+
+                   tasks.view
+                       tasks.view_team
+                       tasks.view_all
+                       tasks.create
+                       tasks.assign
+                       tasks.edit
+                       tasks.complete
+                       tasks.delete
+                                  Task statuses:
+ 
+                                            Pending
+                                            In Progress
+                                            Completed
+                                            Overdue
+                                            Cancelled
+
+           11. Reports permissions
+
+
+
+                      reports.view
+                      reports.view_own
+                      reports.view_team
+                      reports.view_all
+                      reports.export
+
+               Reports:
+
+                   Lead Source Report
+                   Lead Status Report
+                   Conversion Report
+                   Sales Executive Performance
+                   Pending Follow-up Report
+                   Lost Lead Report
+                   Client Report
+                  Task Completion Report
+
+
+           12. Settings permissions:
+
+                settings.view
+                settings.update
+                settings.manage_lead_status
+                settings.manage_lead_source
+                settings.manage_company
+
+
+                 Settings module me:
+
+                  Company Name
+                  Logo
+                  Contact Details
+                  Lead Sources
+                  Lead Statuses
+                  Priorities
+                  Follow-up Types
+                  Date/Time Settings
+                  Email Settings
+                  Notification Settings
+
+
+
+           13. Audit Log 
+
+              Audit log record kare:
+
+              User name
+               Action
+               Module
+               Record ID
+               Old data
+               New data
+               IP address
+               Date and time 
+
+
+            Note: Current RBAC me ek important improvement
+
+             Tumhara current middleware ye check karta hai:
+               User ke paas permission hai ya nahi 
+
+            Lekin ye check nahi karta:          
+               User jis record ko open kar raha hai, wo record uska hai ya nahi
+
+
+
