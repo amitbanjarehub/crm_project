@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $title ?? 'PRO CRM Admin Panel' }}</title>
+
+    <!-- <link rel="stylesheet" href="{{ asset('css/admin.css') }}"> -->
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
+    @stack('styles')
+    <!-- <script src="{{ asset('js/admin.js') }}" defer></script> -->
+    <script src="{{ asset('js/admin.js') }}?v={{ filemtime(public_path('js/admin.js')) }}" defer></script>
+
+</head>
+
+<body>
+
+    <div class="admin-wrapper">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h1>PRO CRM</h1>
+                <p>Admin Panel</p>
+            </div>
+
+            <!-- <nav class="sidebar-menu">
+            <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <span>📊</span> Dashboard
+            </a>
+
+            <a href="{{ route('user.index') }}" class="{{ request()->routeIs('user.*') ? 'active' : '' }}">
+                <span>👥</span> User Management
+            </a>
+
+            <a href="{{ route('role.index') }}" class="{{ request()->routeIs('role.*') ? 'active' : '' }}">
+                <span>🛡️</span> Role Management
+            </a>
+
+            <a href="{{ route('permission.index') }}" class="{{ request()->routeIs('permission.*') ? 'active' : '' }}">
+                <span>🔐</span> Permission Management
+            </a>
+
+            <a href="{{ route('lead.index') }}" class="{{ request()->routeIs('lead.*') ? 'active' : '' }}">
+                <span>📌</span> Lead Management
+            </a>
+
+            <a href="{{ route('client.index') }}" class="{{ request()->routeIs('client.*') ? 'active' : '' }}">
+                <span>🏢</span> Client Management
+            </a>
+
+            <a href="{{ route('setting.index') }}" class="{{ request()->routeIs('setting.*') ? 'active' : '' }}">
+                <span>⚙️</span> Settings
+            </a>
+        </nav> -->
+
+            @php
+                $loggedInUser = auth()->user();
+            @endphp
+
+            <nav class="sidebar-menu">
+
+                @if ($loggedInUser->hasPermission('dashboard.view'))
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                        <span>📊</span> Dashboard
+                    </a>
+                @endif
+
+                @if ($loggedInUser->hasPermission('users.view'))
+                    <a href="{{ route('user.index') }}" class="{{ request()->routeIs('user.*') ? 'active' : '' }}">
+                        <span>👥</span> User Management
+                    </a>
+                @endif
+
+                @if ($loggedInUser->hasPermission('roles.view'))
+                    <a href="{{ route('role.index') }}" class="{{ request()->routeIs('role.*') ? 'active' : '' }}">
+                        <span>🛡️</span> Role Management
+                    </a>
+                @endif
+
+                @if ($loggedInUser->hasPermission('permissions.view'))
+                    <a href="{{ route('permission.index') }}"
+                        class="{{ request()->routeIs('permission.*') ? 'active' : '' }}">
+                        <span>🔐</span> Permission Management
+                    </a>
+                @endif
+
+                @if ($loggedInUser->hasPermission('leads.view'))
+                    <a href="{{ route('lead.index') }}" class="{{ request()->routeIs('lead.*') ? 'active' : '' }}">
+                        <span>📌</span> Lead Management
+                    </a>
+                @endif
+
+                @if ($loggedInUser->hasPermission('follow_ups.view'))
+                    <a href="{{ route('followup.index') }}" class="{{ request()->routeIs('followup.*') ? 'active' : '' }}">
+                        <span>📞</span> Follow-up Management
+                    </a>
+                @endif
+
+                @if ($loggedInUser->hasPermission('clients.view'))
+                    <a href="{{ route('client.index') }}" class="{{ request()->routeIs('client.*') ? 'active' : '' }}">
+                        <span>🏢</span> Client Management
+                    </a>
+                @endif
+
+                @if ($loggedInUser->hasPermission('projects.view'))
+                    <a href="{{ route('project.index') }}" class="{{ request()->routeIs('project.*') ? 'active' : '' }}">
+                        <span>📁</span> Project Management
+                    </a>
+                @endif
+
+                @if ($loggedInUser->hasPermission('tasks.view'))
+                    <a href="{{ route('task.my') }}" class="{{ request()->routeIs('task.*') ? 'active' : '' }}">
+                        <span>✅</span> My Tasks
+                    </a>
+                @endif
+
+                @if ($loggedInUser->hasPermission('settings.view'))
+                    <a href="{{ route('setting.index') }}" class="{{ request()->routeIs('setting.*') ? 'active' : '' }}">
+                        <span>⚙️</span> Settings
+                    </a>
+                @endif
+
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <main class="main-content">
+
+            <!-- Header -->
+            <!-- <header class="topbar">
+                <div>
+                    <h2>{{ $pageTitle ?? 'Dashboard' }}</h2>
+                    <p>Welcome back, manage your CRM from here.</p>
+                </div>
+
+               
+
+                <div class="admin-dropdown" id="adminDropdown">
+
+                    <button type="button" class="admin-btn" id="adminDropdownBtn" aria-expanded="false"
+                        aria-controls="adminDropdownMenu">
+                        <span class="admin-avatar">
+                            {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                        </span>
+
+                        <span class="admin-info">
+                            <strong>
+                                {{ auth()->user()->name ?? 'Admin' }}
+                            </strong>
+
+                            <small>
+                                {{ auth()->user()->role?->name ?? 'No Role' }}
+                            </small>
+                        </span>
+
+                        <span class="dropdown-arrow" id="dropdownArrow">
+                            ▼
+                        </span>
+                    </button>
+
+                    <div class="dropdown-menu" id="adminDropdownMenu" aria-hidden="true">
+                        <div class="dropdown-user">
+                            <strong>
+                                {{ auth()->user()->name ?? 'Admin' }}
+                            </strong>
+
+                            <small>
+                                {{ auth()->user()->email ?? 'admin@crm.com' }}
+                            </small>
+                        </div>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+
+                            <button type="submit" class="logout-btn">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </header> -->
+
+
+<!-- Header -->
+<header class="topbar">
+
+    {{-- Left Side Page Information --}}
+    <div>
+        <h2>
+            {{ $pageTitle ?? 'Dashboard' }}
+        </h2>
+
+        <p>
+            Welcome back, manage your CRM from here.
+        </p>
+    </div>
+
+    {{--
+        Current logged-in user ki notification information.
+
+        $loggedInUser variable sidebar ke upar already
+        define kiya gaya hai:
+
+        @php
+            $loggedInUser = auth()->user();
+        @endphp
+    --}}
+    @php
+        $topbarUnreadCount = $loggedInUser
+            ->unreadNotifications()
+            ->count();
+
+        $topbarNotifications = $loggedInUser
+            ->notifications()
+            ->latest()
+            ->limit(6)
+            ->get();
+    @endphp
+
+    {{-- Right Side Actions --}}
+    <div class="topbar-actions">
+
+        {{-- Notification Dropdown --}}
+        <div
+            class="notification-dropdown"
+            id="notificationDropdown"
+        >
+
+            {{-- Notification Bell --}}
+            <button
+                type="button"
+                class="notification-bell-btn"
+                id="notificationDropdownBtn"
+                aria-expanded="false"
+                aria-controls="notificationDropdownMenu"
+                title="Notifications"
+            >
+                <span class="notification-bell-icon">
+                    🔔
+                </span>
+
+                {{-- Unread Notification Counter --}}
+                @if($topbarUnreadCount > 0)
+                    <span class="notification-bell-badge">
+                        {{ $topbarUnreadCount > 99
+                            ? '99+'
+                            : $topbarUnreadCount }}
+                    </span>
+                @endif
+            </button>
+
+            {{-- Notification Dropdown Menu --}}
+            <div
+                class="notification-dropdown-menu"
+                id="notificationDropdownMenu"
+                aria-hidden="true"
+            >
+
+                {{-- Dropdown Header --}}
+                <div class="notification-dropdown-header">
+
+                    <div>
+                        <strong>
+                            Notifications
+                        </strong>
+
+                        <span>
+                            {{ $topbarUnreadCount }}
+                            {{ $topbarUnreadCount === 1
+                                ? 'unread notification'
+                                : 'unread notifications' }}
+                        </span>
+                    </div>
+
+                    {{-- Mark All as Read --}}
+                    @if($topbarUnreadCount > 0)
+                        <form
+                            method="POST"
+                            action="{{ route(
+                                'notification.read-all'
+                            ) }}"
+                        >
+                            @csrf
+
+                            <button type="submit">
+                                Mark all read
+                            </button>
+                        </form>
+                    @endif
+
+                </div>
+
+                {{-- Latest Notifications --}}
+                <div class="notification-dropdown-list">
+
+                    @forelse(
+                        $topbarNotifications
+                        as $notification
+                    )
+
+                        @php
+                            $notificationData =
+                                $notification->data;
+
+                            $isNotificationUnread =
+                                is_null(
+                                    $notification->read_at
+                                );
+                        @endphp
+
+                        <a
+                            href="{{ route(
+                                'notification.open',
+                                $notification->id
+                            ) }}"
+                            class="notification-dropdown-item
+                                {{ $isNotificationUnread
+                                    ? 'unread'
+                                    : '' }}"
+                        >
+
+                            {{-- Notification Icon --}}
+                            <div class="notification-dropdown-icon">
+                                {{ $notificationData['icon']
+                                    ?? '🔔' }}
+                            </div>
+
+                            {{-- Notification Content --}}
+                            <div class="notification-dropdown-content">
+
+                                <strong>
+                                    {{ $notificationData['title']
+                                        ?? 'CRM Notification' }}
+                                </strong>
+
+                                @if(
+                                    !empty(
+                                        $notificationData['message']
+                                    )
+                                )
+                                    <p>
+                                        {{ $notificationData['message'] }}
+                                    </p>
+                                @endif
+
+                                <small>
+                                    {{ $notification
+                                        ->created_at
+                                        ->diffForHumans() }}
+                                </small>
+
+                            </div>
+
+                            {{-- Unread Blue Dot --}}
+                            @if($isNotificationUnread)
+                                <span class="notification-dropdown-dot">
+                                </span>
+                            @endif
+
+                        </a>
+
+                    @empty
+
+                        {{-- Empty Notification State --}}
+                        <div class="notification-dropdown-empty">
+
+                            <span>
+                                🔔
+                            </span>
+
+                            <strong>
+                                No notifications
+                            </strong>
+
+                            <p>
+                                New CRM updates will appear here.
+                            </p>
+
+                        </div>
+
+                    @endforelse
+
+                </div>
+
+                {{-- Dropdown Footer --}}
+                <div class="notification-dropdown-footer">
+
+                    <a href="{{ route('notification.index') }}">
+                        View All Notifications
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- Existing Admin User Dropdown --}}
+        <div
+            class="admin-dropdown"
+            id="adminDropdown"
+        >
+
+            <button
+                type="button"
+                class="admin-btn"
+                id="adminDropdownBtn"
+                aria-expanded="false"
+                aria-controls="adminDropdownMenu"
+            >
+
+                <span class="admin-avatar">
+                    {{ strtoupper(
+                        substr(
+                            $loggedInUser->name ?? 'A',
+                            0,
+                            1
+                        )
+                    ) }}
+                </span>
+
+                <span class="admin-info">
+
+                    <strong>
+                        {{ $loggedInUser->name
+                            ?? 'Admin' }}
+                    </strong>
+
+                    <small>
+                        {{ $loggedInUser->role?->name
+                            ?? 'No Role' }}
+                    </small>
+
+                </span>
+
+                <span
+                    class="dropdown-arrow"
+                    id="dropdownArrow"
+                >
+                    ▼
+                </span>
+
+            </button>
+
+            {{-- Admin Dropdown Menu --}}
+            <div
+                class="dropdown-menu"
+                id="adminDropdownMenu"
+                aria-hidden="true"
+            >
+
+                <div class="dropdown-user">
+
+                    <strong>
+                        {{ $loggedInUser->name
+                            ?? 'Admin' }}
+                    </strong>
+
+                    <small>
+                        {{ $loggedInUser->email
+                            ?? 'admin@crm.com' }}
+                    </small>
+
+                </div>
+
+                <form
+                    method="POST"
+                    action="{{ route('logout') }}"
+                >
+                    @csrf
+
+                    <button
+                        type="submit"
+                        class="logout-btn"
+                    >
+                        Logout
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+            <!-- Body -->
+            <section class="page-body">
+                @yield('content')
+            </section>
+
+        </main>
+
+    </div>
+    @stack('scripts')
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+<?php
+
+use App\Modules\Role\Controllers\RoleController;
+use App\Modules\Role\Controllers\RolePermissionController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', [RoleController::class, 'index'])
+    ->middleware('permission:roles.view')
+    ->name('index');
+
+Route::get('/{role}/permissions', [
+    RolePermissionController::class,
+    'edit'
+])
+    ->middleware('permission:roles.manage_permissions')
+    ->name('permissions.edit');
+
+Route::put('/{role}/permissions', [
+    RolePermissionController::class,
+    'update'
+])
+    ->middleware('permission:roles.manage_permissions')
+    ->name('permissions.update');

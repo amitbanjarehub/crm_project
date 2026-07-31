@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Modules\Role\Models\Role;
+use App\Modules\User\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+class DashboardController extends Controller
+{
+    public function index()
+    {
+        $loggedInUser = auth()->user();
+
+        $cards = [];
+        $quickActions = [];
+
+        if ($loggedInUser->hasPermission('users.view')) {
+            $cards[] = [
+                'title' => 'Total Users',
+                'value' => User::count(),
+                'note' => 'Registered CRM users',
+                'icon' => '👥',
+                'color' => 'blue',
+            ];
+
+            $quickActions[] = [
+                'title' => 'Manage Users',
+                'description' => 'Create and manage CRM users',
+                'icon' => '👥',
+                'route' => route('user.index'),
+            ];
+        }
+
+        if ($loggedInUser->hasPermission('leads.view')) {
+            $leadCount = Schema::hasTable('leads')
+                ? DB::table('leads')->count()
+                : 0;
+
+            $cards[] = [
+                'title' => 'Total Leads',
+                'value' => $leadCount,
+                'note' => 'Available business leads',
+                'icon' => '📌',
+                'color' => 'orange',
+            ];
+
+            $quickActions[] = [
+                'title' => 'Manage Leads',
+                'description' => 'Track business leads',
+                'icon' => '📌',
+                'route' => route('lead.index'),
+            ];
+        }
+
+        if ($loggedInUser->hasPermission('clients.view')) {
+            $clientCount = Schema::hasTable('clients')
+                ? DB::table('clients')->count()
+                : 0;
+
+            $cards[] = [
+                'title' => 'Total Clients',
+                'value' => $clientCount,
+                'note' => 'Available client records',
+                'icon' => '🏢',
+                'color' => 'purple',
+            ];
+
+            $quickActions[] = [
+                'title' => 'Manage Clients',
+                'description' => 'View client records',
+                'icon' => '🏢',
+                'route' => route('client.index'),
+            ];
+        }
+
+        if ($loggedInUser->hasPermission('roles.view')) {
+            $cards[] = [
+                'title' => 'Roles',
+                'value' => Role::count(),
+                'note' => 'Available CRM roles',
+                'icon' => '🛡️',
+                'color' => 'green',
+            ];
+        }
+
+        return view('admin::dashboard', compact(
+            'cards',
+            'quickActions'
+        ))->with([
+            'pageTitle' => 'Dashboard',
+        ]);
+    }
+}

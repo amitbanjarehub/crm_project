@@ -1,0 +1,2223 @@
+.time-tracking-hidden {
+    display: none !important;
+}
+
+/* =========================================================
+   GLOBAL TOPBAR TIMER
+========================================================= */
+
+.global-time-tracker {
+    min-width: 350px;
+    min-height: 50px;
+
+    display: grid;
+    grid-template-columns:
+        10px minmax(120px, 1fr) auto auto;
+
+    align-items: center;
+    gap: 10px;
+
+    padding: 7px 10px;
+
+    border: 1px solid #bbf7d0;
+    border-radius: 13px;
+
+    background: #f0fdf4;
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.07);
+}
+
+.global-time-status-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+    background: #16a34a;
+
+    box-shadow:
+        0 0 0 4px rgba(22, 163, 74, 0.14);
+
+    animation:
+        timerPulse 1.5s infinite;
+}
+
+.global-time-tracker.timer-paused {
+    border-color: #fed7aa;
+    background: #fff7ed;
+}
+
+.global-time-tracker.timer-paused .global-time-status-dot {
+    background: #f59e0b;
+    animation: none;
+}
+
+.global-time-information {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+}
+
+.global-time-information a {
+    overflow: hidden;
+
+    color: #0f172a;
+    font-size: 11px;
+    font-weight: 800;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.global-time-information small {
+    overflow: hidden;
+
+    color: #64748b;
+    font-size: 9px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.global-time-tracker>strong {
+    color: #0f172a;
+
+    font-size: 15px;
+    font-variant-numeric:
+        tabular-nums;
+
+    white-space: nowrap;
+}
+
+.global-time-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.global-time-actions button {
+    min-height: 30px;
+    padding: 0 8px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #334155;
+
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.global-time-actions button:last-child {
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+@keyframes timerPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.82);
+    }
+}
+
+/* =========================================================
+   TASK TIMER PANEL
+========================================================= */
+
+.time-tracking-task-panel {
+    padding: 20px;
+
+    border: 1px solid #bfdbfe;
+    border-radius: 15px;
+
+    background: #f8fbff;
+
+    box-shadow:
+        0 8px 22px rgba(15, 23, 42, 0.05);
+}
+
+.time-tracking-status-badge {
+    padding: 6px 10px;
+
+    border-radius: 999px;
+    background: #e0e7ff;
+    color: #3730a3;
+
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.time-tracking-task-grid,
+.time-tracking-summary-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    gap: 13px;
+}
+
+.time-tracking-stat-card {
+    min-height: 92px;
+
+    display: grid;
+    align-content: center;
+    gap: 7px;
+
+    padding: 15px;
+
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+
+    background: #ffffff;
+}
+
+.time-tracking-stat-card span {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 750;
+    text-transform: uppercase;
+}
+
+.time-tracking-stat-card strong {
+    color: #0f172a;
+    font-size: 17px;
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+.time-tracking-work-note {
+    display: grid;
+    gap: 7px;
+
+    margin-top: 15px;
+}
+
+.time-tracking-work-note label {
+    color: #334155;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.time-tracking-work-note textarea {
+    width: 100%;
+    padding: 11px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+
+    background: #ffffff;
+    color: #0f172a;
+
+    font-family: inherit;
+    resize: vertical;
+}
+
+.time-tracking-task-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+
+    margin-top: 14px;
+}
+
+.time-start-btn,
+.time-pause-btn,
+.time-resume-btn,
+.time-stop-btn,
+.time-start-table-btn {
+    min-height: 38px;
+    padding: 0 13px;
+
+    border: none;
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.time-start-btn,
+.time-resume-btn {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.time-pause-btn {
+    background: #f59e0b;
+    color: #ffffff;
+}
+
+.time-stop-btn {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.time-start-table-btn {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.time-tracking-other-task-warning,
+.time-tracking-unavailable {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    padding: 11px 13px;
+
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+
+    background: #fff7ed;
+    color: #9a3412;
+
+    font-size: 11px;
+}
+
+.time-tracking-other-task-warning a {
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.time-tracking-history {
+    margin-top: 22px;
+}
+
+.time-tracking-history h3 {
+    margin-bottom: 12px;
+    color: #0f172a;
+    font-size: 15px;
+}
+
+.time-entry-status {
+    display: inline-flex;
+    padding: 5px 8px;
+
+    border-radius: 999px;
+
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.time-entry-status.status-running {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.time-entry-status.status-paused {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.time-entry-status.status-stopped {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.task-tracked-time-cell {
+    display: grid;
+    gap: 4px;
+}
+
+.task-tracked-time-cell strong {
+    font-size: 12px;
+    font-variant-numeric:
+        tabular-nums;
+}
+
+.task-timer-running-badge {
+    color: #16a34a;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+/* =========================================================
+   AJAX MESSAGE
+========================================================= */
+
+.time-tracking-message {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 2147483647;
+
+    max-width: 360px;
+    padding: 13px 16px;
+
+    border-radius: 11px;
+
+    background: #0f172a;
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.25);
+
+    animation:
+        timeMessageIn 0.22s ease;
+}
+
+.time-tracking-message.success {
+    background: #166534;
+}
+
+.time-tracking-message.error {
+    background: #b91c1c;
+}
+
+.time-tracking-message.removing {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+@keyframes timeMessageIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1250px) {
+    .global-time-tracker {
+        min-width: 250px;
+        grid-template-columns:
+            10px minmax(80px, 1fr) auto;
+    }
+
+    .global-time-actions {
+        grid-column: 2 / -1;
+    }
+
+    .time-tracking-task-grid,
+    .time-tracking-summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 850px) {
+    .global-time-tracker {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        z-index: 2000;
+
+        width: auto;
+    }
+
+    .time-tracking-task-grid,
+    .time-tracking-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   TIME TRACKING REPORT PAGE
+========================================================= */
+
+.time-report-page {
+    width: 100%;
+}
+
+.time-report-main-card {
+    padding: 28px;
+    overflow: hidden;
+}
+
+/* =========================================================
+   REPORT HEADER
+========================================================= */
+
+.time-report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.time-report-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.time-report-heading-icon {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 23px;
+}
+
+.time-report-heading h1 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.time-report-heading p {
+    margin-top: 5px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.time-report-back-btn {
+    min-height: 42px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 0 15px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+
+    background: #ffffff;
+    color: #334155;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.time-report-back-btn:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.time-report-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    margin-bottom: 17px;
+}
+
+.time-report-section-heading h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 17px;
+    font-weight: 850;
+}
+
+.time-report-section-heading p {
+    margin-top: 4px;
+
+    color: #64748b;
+
+    font-size: 11px;
+}
+
+.time-report-count,
+.time-report-date-range {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    background: #eff6ff;
+    color: #1d4ed8;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+/* =========================================================
+   REPORT FILTER
+========================================================= */
+
+.time-report-filter-card {
+    padding: 20px;
+    margin-bottom: 22px;
+
+    border: 1px solid #dbe3ef;
+    border-radius: 15px;
+
+    background: #f8fafc;
+}
+
+.time-report-filter-form {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(145px, 0.8fr)) minmax(160px, 1fr) minmax(150px, 1fr) minmax(230px, 1.5fr) auto;
+
+    align-items: end;
+    gap: 13px;
+}
+
+.time-report-filter-field {
+    min-width: 0;
+
+    display: grid;
+    gap: 7px;
+}
+
+.time-report-filter-field label {
+    color: #334155;
+
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.time-report-filter-field input,
+.time-report-filter-field select {
+    width: 100%;
+    height: 44px;
+
+    padding: 0 12px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+
+    outline: none;
+
+    background: #ffffff;
+    color: #0f172a;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.time-report-filter-field input:focus,
+.time-report-filter-field select:focus {
+    border-color: #60a5fa;
+
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.time-report-filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.time-report-apply-btn,
+.time-report-reset-btn {
+    height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 0 14px;
+
+    border-radius: 10px;
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.time-report-apply-btn {
+    border: 1px solid #2563eb;
+
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.time-report-apply-btn:hover {
+    border-color: #1d4ed8;
+    background: #1d4ed8;
+}
+
+.time-report-reset-btn {
+    border: 1px solid #cbd5e1;
+
+    background: #ffffff;
+    color: #475569;
+}
+
+.time-report-reset-btn:hover {
+    border-color: #94a3b8;
+    background: #f1f5f9;
+}
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.time-report-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-bottom: 24px;
+}
+
+.time-report-summary-card {
+    min-height: 120px;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 18px;
+
+    border: 1px solid #dbe3ef;
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 7px 18px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.time-report-summary-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 25px rgba(15, 23, 42, 0.08);
+}
+
+.time-report-summary-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    font-size: 20px;
+}
+
+.time-report-summary-icon.blue {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.time-report-summary-icon.purple {
+    background: #f5f3ff;
+    color: #7c3aed;
+}
+
+.time-report-summary-icon.green {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.time-report-summary-icon.orange {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.time-report-summary-card>div:last-child {
+    min-width: 0;
+
+    display: grid;
+    gap: 5px;
+}
+
+.time-report-summary-card span {
+    color: #64748b;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.time-report-summary-card strong {
+    color: #0f172a;
+
+    font-size: 22px;
+    font-weight: 900;
+
+    font-variant-numeric: tabular-nums;
+}
+
+.time-report-summary-card small {
+    color: #94a3b8;
+
+    font-size: 9px;
+}
+
+/* =========================================================
+   REPORT SECTIONS
+========================================================= */
+
+.time-report-section {
+    padding: 20px;
+    margin-top: 20px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 7px 18px rgba(15, 23, 42, 0.035);
+}
+
+/* =========================================================
+   REPORT TABLE
+========================================================= */
+
+.time-report-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.time-report-table {
+    width: 100%;
+    min-width: 650px;
+
+    border-collapse: collapse;
+
+    background: #ffffff;
+}
+
+.time-report-detail-table {
+    min-width: 1250px;
+}
+
+.time-report-table thead {
+    background: #f8fafc;
+}
+
+.time-report-table th {
+    padding: 12px 14px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    color: #475569;
+
+    font-size: 10px;
+    font-weight: 850;
+
+    letter-spacing: 0.35px;
+    text-align: left;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+.time-report-table td {
+    padding: 14px;
+
+    border-bottom: 1px solid #eef2f7;
+
+    color: #334155;
+
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.time-report-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.time-report-table tbody tr {
+    transition: background 0.18s ease;
+}
+
+.time-report-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* =========================================================
+   EMPLOYEE CELL
+========================================================= */
+
+.time-report-user-cell {
+    min-width: 170px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.time-report-user-avatar {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.time-report-user-avatar.small {
+    width: 32px;
+    height: 32px;
+
+    font-size: 10px;
+}
+
+.time-report-user-cell>div {
+    min-width: 0;
+
+    display: grid;
+    gap: 3px;
+}
+
+.time-report-user-cell strong {
+    color: #0f172a;
+
+    font-size: 12px;
+}
+
+.time-report-user-cell small {
+    color: #94a3b8;
+
+    font-size: 9px;
+}
+
+/* =========================================================
+   ROLE AND PROJECT
+========================================================= */
+
+.time-report-role-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    background: #f5f3ff;
+    color: #6d28d9;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    text-transform: capitalize;
+}
+
+.time-report-role-cell,
+.time-report-project-cell {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.time-report-role-cell>span,
+.time-report-project-cell>span {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #eff6ff;
+
+    font-size: 14px;
+}
+
+.time-report-role-cell strong,
+.time-report-project-cell strong {
+    color: #0f172a;
+
+    font-size: 12px;
+}
+
+.time-report-project-code {
+    display: inline-flex;
+
+    padding: 5px 8px;
+
+    border-radius: 7px;
+
+    background: #f1f5f9;
+    color: #475569;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+.time-report-project-information,
+.time-report-date-cell {
+    display: grid;
+    gap: 3px;
+}
+
+.time-report-project-information strong,
+.time-report-date-cell strong {
+    color: #0f172a;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+}
+
+.time-report-project-information small,
+.time-report-date-cell small {
+    color: #94a3b8;
+
+    font-size: 9px;
+}
+
+/* =========================================================
+   DURATION AND NUMBER
+========================================================= */
+
+.time-report-duration {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 82px;
+
+    padding: 6px 9px;
+
+    border-radius: 8px;
+
+    background: #eff6ff;
+    color: #1d4ed8;
+
+    font-size: 11px;
+    font-weight: 850;
+
+    font-variant-numeric: tabular-nums;
+}
+
+.time-report-number {
+    color: #0f172a;
+
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   TASK LINK
+========================================================= */
+
+.time-report-task-link {
+    display: inline-block;
+
+    max-width: 210px;
+    overflow: hidden;
+
+    color: #2563eb;
+
+    font-size: 11px;
+    font-weight: 750;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.time-report-task-link:hover {
+    color: #1d4ed8;
+
+    text-decoration: underline;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.time-report-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 9px;
+    font-weight: 850;
+
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.time-report-status.status-running {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.time-report-status.status-paused {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.time-report-status.status-stopped {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.time-report-running-text {
+    color: #059669;
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.time-report-deleted-text {
+    color: #94a3b8;
+
+    font-size: 10px;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.time-report-empty {
+    min-height: 125px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 22px;
+
+    text-align: center;
+}
+
+.time-report-empty>span {
+    margin-bottom: 9px;
+
+    font-size: 25px;
+}
+
+.time-report-empty strong {
+    color: #0f172a;
+
+    font-size: 13px;
+}
+
+.time-report-empty p {
+    margin-top: 5px;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+}
+
+/* =========================================================
+   RESPONSIVE REPORT
+========================================================= */
+
+@media (max-width: 1350px) {
+
+    .time-report-filter-form {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+    .time-report-filter-actions {
+        align-self: end;
+    }
+
+    .time-report-summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 850px) {
+
+    .time-report-main-card {
+        padding: 18px;
+    }
+
+    .time-report-header,
+    .time-report-section-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .time-report-back-btn {
+        width: fit-content;
+    }
+
+    .time-report-filter-form,
+    .time-report-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .time-report-filter-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .time-report-apply-btn,
+    .time-report-reset-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 550px) {
+
+    .time-report-heading {
+        align-items: flex-start;
+    }
+
+    .time-report-heading-icon {
+        width: 44px;
+        height: 44px;
+
+        font-size: 19px;
+    }
+
+    .time-report-heading h1 {
+        font-size: 21px;
+    }
+
+    .time-report-summary-card {
+        min-height: 105px;
+    }
+}
+
+/* =========================================================
+   MY TIME TRACKING PAGE
+========================================================= */
+
+.time-my-page {
+    width: 100%;
+}
+
+.time-my-main-card {
+    padding: 28px;
+    overflow: hidden;
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.time-my-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.time-my-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.time-my-heading-icon {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 23px;
+}
+
+.time-my-heading h1 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.time-my-heading p {
+    margin-top: 5px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.time-my-header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.time-my-primary-btn,
+.time-my-secondary-btn,
+.time-my-open-task-btn,
+.time-my-start-task-btn {
+    min-height: 42px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 0 15px;
+
+    border-radius: 10px;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.time-my-primary-btn,
+.time-my-start-task-btn {
+    border: 1px solid #2563eb;
+
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.time-my-primary-btn:hover,
+.time-my-start-task-btn:hover {
+    border-color: #1d4ed8;
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+.time-my-secondary-btn {
+    border: 1px solid #cbd5e1;
+
+    background: #ffffff;
+    color: #334155;
+}
+
+.time-my-secondary-btn:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+/* =========================================================
+   ACTIVE TIMER PANEL
+========================================================= */
+
+.time-my-active-timer {
+    display: grid;
+    grid-template-columns:
+        minmax(220px, 1fr) auto auto;
+
+    align-items: center;
+    gap: 20px;
+
+    padding: 18px 20px;
+    margin-bottom: 22px;
+
+    border: 1px solid #bbf7d0;
+    border-radius: 15px;
+
+    background:
+        linear-gradient(135deg,
+            #f0fdf4,
+            #ffffff);
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.time-my-active-timer.timer-paused {
+    border-color: #fed7aa;
+
+    background:
+        linear-gradient(135deg,
+            #fff7ed,
+            #ffffff);
+}
+
+.time-my-active-main {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.time-my-active-indicator {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #16a34a;
+
+    box-shadow:
+        0 0 0 6px rgba(22, 163, 74, 0.14);
+
+    animation:
+        timeMyPulse 1.5s infinite;
+}
+
+.timer-paused .time-my-active-indicator {
+    background: #f59e0b;
+
+    box-shadow:
+        0 0 0 6px rgba(245, 158, 11, 0.15);
+
+    animation: none;
+}
+
+.time-my-active-information {
+    min-width: 0;
+
+    display: grid;
+    gap: 4px;
+}
+
+.time-my-active-label {
+    color: #15803d;
+
+    font-size: 9px;
+    font-weight: 850;
+
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.timer-paused .time-my-active-label {
+    color: #c2410c;
+}
+
+.time-my-active-information a {
+    max-width: 420px;
+    overflow: hidden;
+
+    color: #0f172a;
+
+    font-size: 14px;
+    font-weight: 850;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.time-my-active-information small {
+    color: #64748b;
+
+    font-size: 10px;
+}
+
+.time-my-active-clock {
+    display: grid;
+    gap: 4px;
+
+    text-align: right;
+}
+
+.time-my-active-clock span {
+    color: #64748b;
+
+    font-size: 9px;
+    font-weight: 750;
+
+    text-transform: uppercase;
+}
+
+.time-my-active-clock strong {
+    color: #0f172a;
+
+    font-size: 22px;
+    font-weight: 900;
+
+    font-variant-numeric: tabular-nums;
+}
+
+.time-my-open-task-btn {
+    border: 1px solid #bbf7d0;
+
+    background: #ffffff;
+    color: #15803d;
+}
+
+.time-my-open-task-btn:hover {
+    background: #dcfce7;
+}
+
+@keyframes timeMyPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.55;
+        transform: scale(0.8);
+    }
+}
+
+/* =========================================================
+   NO ACTIVE TIMER
+========================================================= */
+
+.time-my-no-active-timer {
+    display: grid;
+    grid-template-columns:
+        48px minmax(0, 1fr) auto;
+
+    align-items: center;
+    gap: 14px;
+
+    padding: 17px 19px;
+    margin-bottom: 22px;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+
+    background: #f8fafc;
+}
+
+.time-my-no-active-icon {
+    width: 48px;
+    height: 48px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: #e0e7ff;
+    color: #4338ca;
+
+    font-size: 18px;
+}
+
+.time-my-no-active-timer strong {
+    color: #0f172a;
+
+    font-size: 13px;
+}
+
+.time-my-no-active-timer p {
+    margin-top: 4px;
+
+    color: #64748b;
+
+    font-size: 11px;
+}
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.time-my-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-bottom: 24px;
+}
+
+.time-my-summary-card {
+    min-height: 120px;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 18px;
+
+    border: 1px solid #dbe3ef;
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 7px 18px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.time-my-summary-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 25px rgba(15, 23, 42, 0.08);
+}
+
+.time-my-summary-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    font-size: 19px;
+    font-weight: 900;
+}
+
+.time-my-summary-icon.blue {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.time-my-summary-icon.green {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.time-my-summary-icon.purple {
+    background: #f5f3ff;
+    color: #7c3aed;
+}
+
+.time-my-summary-icon.orange {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.time-my-summary-card>div:last-child {
+    min-width: 0;
+
+    display: grid;
+    gap: 5px;
+}
+
+.time-my-summary-card span {
+    color: #64748b;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.35px;
+    text-transform: uppercase;
+}
+
+.time-my-summary-card strong {
+    color: #0f172a;
+
+    font-size: 21px;
+    font-weight: 900;
+
+    font-variant-numeric: tabular-nums;
+}
+
+.time-my-summary-card small {
+    color: #94a3b8;
+
+    font-size: 9px;
+}
+
+.time-my-timer-state.active {
+    color: #15803d;
+}
+
+.time-my-timer-state.inactive {
+    color: #64748b;
+}
+
+/* =========================================================
+   HISTORY SECTION
+========================================================= */
+
+.time-my-history-section {
+    padding: 20px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 7px 18px rgba(15, 23, 42, 0.035);
+}
+
+.time-my-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    margin-bottom: 17px;
+}
+
+.time-my-section-heading h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 17px;
+    font-weight: 850;
+}
+
+.time-my-section-heading p {
+    margin-top: 4px;
+
+    color: #64748b;
+
+    font-size: 11px;
+}
+
+.time-my-record-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    background: #eff6ff;
+    color: #1d4ed8;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+/* =========================================================
+   HISTORY TABLE
+========================================================= */
+
+.time-my-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.time-my-table {
+    width: 100%;
+    min-width: 1120px;
+
+    border-collapse: collapse;
+
+    background: #ffffff;
+}
+
+.time-my-table thead {
+    background: #f8fafc;
+}
+
+.time-my-table th {
+    padding: 12px 14px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    color: #475569;
+
+    font-size: 10px;
+    font-weight: 850;
+
+    letter-spacing: 0.35px;
+    text-align: left;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+.time-my-table td {
+    padding: 14px;
+
+    border-bottom: 1px solid #eef2f7;
+
+    color: #334155;
+
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.time-my-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.time-my-table tbody tr {
+    transition: background 0.18s ease;
+}
+
+.time-my-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* =========================================================
+   TASK AND PROJECT CELLS
+========================================================= */
+
+.time-my-task-cell {
+    min-width: 210px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.time-my-task-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.time-my-task-cell>div,
+.time-my-project-cell,
+.time-my-date-cell {
+    min-width: 0;
+
+    display: grid;
+    gap: 3px;
+}
+
+.time-my-task-cell a,
+.time-my-task-cell strong,
+.time-my-project-cell strong,
+.time-my-date-cell strong {
+    color: #0f172a;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.time-my-task-cell a {
+    max-width: 190px;
+    overflow: hidden;
+
+    color: #2563eb;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.time-my-task-cell a:hover {
+    color: #1d4ed8;
+
+    text-decoration: underline;
+}
+
+.time-my-task-cell small,
+.time-my-project-cell small,
+.time-my-date-cell small {
+    color: #94a3b8;
+
+    font-size: 9px;
+}
+
+/* =========================================================
+   STATUS AND DURATION
+========================================================= */
+
+.time-my-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 9px;
+    font-weight: 850;
+
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.time-my-status-badge.status-running {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.time-my-status-badge.status-paused {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.time-my-status-badge.status-stopped {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.time-my-duration {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 84px;
+
+    padding: 6px 9px;
+
+    border-radius: 8px;
+
+    background: #eff6ff;
+    color: #1d4ed8;
+
+    font-size: 11px;
+    font-weight: 850;
+
+    font-variant-numeric: tabular-nums;
+}
+
+.time-my-still-active {
+    color: #059669;
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.time-my-note {
+    display: inline-block;
+
+    max-width: 220px;
+    overflow: hidden;
+
+    color: #475569;
+
+    font-size: 10px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.time-my-no-note {
+    color: #94a3b8;
+
+    font-size: 10px;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.time-my-empty-state {
+    min-height: 260px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    text-align: center;
+}
+
+.time-my-empty-icon {
+    width: 58px;
+    height: 58px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 14px;
+
+    border-radius: 17px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 25px;
+}
+
+.time-my-empty-state h3 {
+    color: #0f172a;
+
+    font-size: 16px;
+}
+
+.time-my-empty-state p {
+    max-width: 390px;
+
+    margin: 7px 0 16px;
+
+    color: #64748b;
+
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.time-my-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    margin-top: 18px;
+}
+
+.time-my-pagination-summary {
+    color: #64748b;
+
+    font-size: 10px;
+}
+
+.time-my-pagination-summary strong {
+    color: #0f172a;
+}
+
+.time-my-pagination-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.time-my-page-btn {
+    min-height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 11px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #334155;
+
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.time-my-page-btn:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.time-my-page-btn.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.time-my-page-number {
+    color: #64748b;
+
+    font-size: 10px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1250px) {
+
+    .time-my-summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .time-my-active-timer {
+        grid-template-columns:
+            minmax(200px, 1fr) auto;
+    }
+
+    .time-my-open-task-btn {
+        grid-column: 1 / -1;
+
+        width: fit-content;
+    }
+}
+
+@media (max-width: 800px) {
+
+    .time-my-main-card {
+        padding: 18px;
+    }
+
+    .time-my-header,
+    .time-my-section-heading,
+    .time-my-pagination {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .time-my-header-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .time-my-primary-btn,
+    .time-my-secondary-btn {
+        width: 100%;
+    }
+
+    .time-my-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .time-my-active-timer,
+    .time-my-no-active-timer {
+        grid-template-columns: 1fr;
+    }
+
+    .time-my-active-clock {
+        text-align: left;
+    }
+
+    .time-my-start-task-btn {
+        width: fit-content;
+    }
+
+    .time-my-pagination-actions {
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 550px) {
+
+    .time-my-heading {
+        align-items: flex-start;
+    }
+
+    .time-my-heading-icon {
+        width: 44px;
+        height: 44px;
+
+        font-size: 19px;
+    }
+
+    .time-my-heading h1 {
+        font-size: 21px;
+    }
+
+    .time-my-summary-card {
+        min-height: 105px;
+    }
+}

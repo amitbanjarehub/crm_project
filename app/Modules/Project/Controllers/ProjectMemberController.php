@@ -1,0 +1,212 @@
+<?php
+
+namespace App\Modules\Project\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Modules\Notification\Support\CrmNotifier;
+use App\Modules\Project\Models\Project;
+use App\Modules\Project\Support\AuthorizesProjectAccess;
+use App\Modules\Project\Support\ProjectActivityLogger;
+use App\Modules\User\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
+class ProjectMemberController extends Controller
+{
+    use AuthorizesProjectAccess;
+
+    /**
+     * Project me naya member add karega.
+     */
+    public function store(
+        Request $request,
+        Project $project,
+        CrmNotifier $notifier
+    ) {
+        $this->ensureCanAccessProject(
+            $request->user(),
+            $project
+        );
+
+        abort_if(
+            $project->isClosed(),
+            422,
+            'Closed project me members add nahi kar sakte.'
+        );
+
+        $validated = $request->validate([
+            'user_id' => [
+                'required',
+                Rule::exists('users', 'id')
+                    ->where('is_active', true),
+            ],
+
+            'member_role' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+        ]);
+
+        $user = User::findOrFail(
+            $validated['user_id']
+        );
+
+        $project->members()->syncWithoutDetaching([
+            $user->id => [
+                'member_role' =>
+                    $validated['member_role'] ?? null,
+
+                'added_by' =>
+                    $request->user()->id,
+            ],
+        ]);
+
+        ProjectActivityLogger::log(
+            $project,
+            'member_added',
+            "{$user->name} added to project team.",
+            $user
+        );
+
+        /*
+         * Project me add kiye gaye member ko
+         * in-app notification bhejo.
+         */
+        $memberRole =
+            $validated['member_role']
+            ?? 'Team Member';
+
+        $notifier->send(
+            $user,
+            [
+                'kind' => 'project_member_added',
+
+                'title' => 'Added to Project Team',
+
+                'message' =>
+                    "You were added to {$project->project_code} — {$project->name} as {$memberRole}.",
+
+                'url' => route(
+                    'project.show',
+                    $project->id,
+                    false
+                ),
+
+                'icon' => '👥',
+
+                'level' => 'info',
+
+                'project_id' => $project->id,
+            ],
+            null,
+            $request->user()
+        );
+
+        return back()->with(
+            'success',
+            'Project member added successfully.'
+        );
+    }
+
+    /**
+     * Project se member remove karega.
+     */
+    public function destroy(
+        Request $request,
+        Project $project,
+        User $user,
+        CrmNotifier $notifier
+    ) {
+        $this->ensureCanAccessProject(
+            $request->user(),
+            $project
+        );
+
+        /*
+         * Project Manager ko direct member list se
+         * remove nahi kiya ja sakta.
+         */
+        if (
+            (int) $project->project_manager_id
+            === (int) $user->id
+        ) {
+            return back()->with(
+                'error',
+                'Project Manager ko remove karne se pehle manager change karein.'
+            );
+        }
+
+        /*
+         * Pending tasks assigned hone par
+         * member remove nahi hoga.
+         */
+        if (
+            $project->tasks()
+                ->where(
+                    'assigned_to',
+                    $user->id
+                )
+                ->whereNotIn(
+                    'status',
+                    [
+                        'completed',
+                        'cancelled',
+                    ]
+                )
+                ->exists()
+        ) {
+            return back()->with(
+                'error',
+                'User ke pending tasks reassign karne ke baad member remove karein.'
+            );
+        }
+
+        $project->members()->detach(
+            $user->id
+        );
+
+        ProjectActivityLogger::log(
+            $project,
+            'member_removed',
+            "{$user->name} removed from project team.",
+            $user
+        );
+
+        /*
+         * Removed member ko in-app notification bhejo.
+         */
+        $notifier->send(
+            $user,
+            [
+                'kind' => 'project_member_removed',
+
+                'title' =>
+                    'Removed from Project Team',
+
+                'message' =>
+                    "You were removed from project {$project->project_code} — {$project->name}.",
+
+                /*
+                 * Member remove hone ke baad ho sakta hai
+                 * project access available na rahe,
+                 * isliye Dashboard par redirect hoga.
+                 */
+                'url' => '/dashboard',
+
+                'icon' => '👤',
+
+                'level' => 'warning',
+
+                'project_id' => $project->id,
+            ],
+            null,
+            $request->user()
+        );
+
+        return back()->with(
+            'success',
+            'Project member removed successfully.'
+        );
+    }
+}

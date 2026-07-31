@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Modules\Lead\Models;
+
+use App\Modules\Client\Models\Client;
+use App\Modules\FollowUp\Models\FollowUp;
+use App\Modules\User\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+class Lead extends Model
+{
+    protected $table = 'leads';
+
+    protected $fillable = [
+        'name',
+        'phone',
+        'email',
+        'company',
+        'source',
+        'status',
+        'priority',
+        'assigned_to',
+        'created_by',
+        'next_follow_up_at',
+        'notes',
+        'converted_at',
+        'converted_by',
+    ];
+
+    protected $casts = [
+        'next_follow_up_at' => 'datetime',
+        'converted_at' => 'datetime',
+    ];
+
+    public const STATUSES = [
+        'new' => 'New',
+        'contacted' => 'Contacted',
+        'follow_up' => 'Follow-up',
+        'qualified' => 'Qualified',
+        'converted' => 'Converted',
+        'lost' => 'Lost',
+    ];
+
+    public const PRIORITIES = [
+        'low' => 'Low',
+        'medium' => 'Medium',
+        'high' => 'High',
+        'urgent' => 'Urgent',
+    ];
+
+    public const SOURCES = [
+        'website' => 'Website',
+        'whatsapp' => 'WhatsApp',
+        'facebook' => 'Facebook',
+        'instagram' => 'Instagram',
+        'google' => 'Google',
+        'referral' => 'Referral',
+        'walk_in' => 'Walk-in',
+        'phone_call' => 'Phone Call',
+        'other' => 'Other',
+    ];
+
+    public function assignedUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function convertedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'converted_by');
+    }
+
+    public function followUps(): HasMany
+    {
+        return $this->hasMany(FollowUp::class, 'lead_id');
+    }
+
+    public function client(): HasOne
+    {
+        return $this->hasOne(Client::class, 'lead_id');
+    }
+
+    public static function statuses(): array
+    {
+        return self::STATUSES;
+    }
+
+    /**
+     * Converted status manually select nahi hoga.
+     * Conversion controller hi converted karega.
+     */
+    public static function editableStatuses(): array
+    {
+        return array_filter(
+            self::STATUSES,
+            fn (string $key) => $key !== 'converted',
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    public static function priorities(): array
+    {
+        return self::PRIORITIES;
+    }
+
+    public static function sources(): array
+    {
+        return self::SOURCES;
+    }
+
+    public function isConverted(): bool
+    {
+        if ($this->status === 'converted') {
+            return true;
+        }
+
+        if ($this->relationLoaded('client')) {
+            return $this->client !== null;
+        }
+
+        return $this->client()->exists();
+    }
+}

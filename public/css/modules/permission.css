@@ -1,0 +1,549 @@
+/* =========================================================
+   PERMISSION MANAGEMENT PAGE
+========================================================= */
+
+.permission-page {
+    width: 100%;
+}
+
+.permission-page *,
+.permission-page *::before,
+.permission-page *::after {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.permission-main-card {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.06);
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.permission-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 30px;
+    border-bottom: 1px solid #e8edf5;
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(37, 99, 235, 0.09),
+            transparent 34%
+        ),
+        #ffffff;
+}
+
+.permission-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.permission-heading-icon {
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24);
+    font-size: 24px;
+}
+
+.permission-heading h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 25px;
+    line-height: 1.25;
+    font-weight: 800;
+}
+
+.permission-heading p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.permission-summary {
+    min-width: 310px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 13px 18px;
+    border: 1px solid #dbe4f0;
+    border-radius: 14px;
+    background: rgba(248, 250, 252, 0.92);
+}
+
+.permission-summary-item {
+    flex: 1;
+    display: grid;
+    gap: 3px;
+}
+
+.permission-summary-item span {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.permission-summary-item strong {
+    color: #0f172a;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.permission-summary-divider {
+    width: 1px;
+    height: 36px;
+    background: #dbe4f0;
+}
+
+/* =========================================================
+   INFORMATION BAR
+========================================================= */
+
+.permission-info-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 30px 0;
+    padding: 13px 15px;
+    border: 1px solid #bfdbfe;
+    border-radius: 11px;
+    background: #eff6ff;
+}
+
+.permission-info-icon {
+    width: 23px;
+    height: 23px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.permission-info-bar p {
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   GROUP GRID
+========================================================= */
+
+.permission-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    padding: 22px 30px 30px;
+}
+
+/* =========================================================
+   GROUP CARD
+========================================================= */
+
+.permission-group-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.04);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.permission-group-card:hover {
+    border-color: #cbdcf5;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================================================
+   GROUP CARD HEADER
+========================================================= */
+
+.permission-group-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 17px 18px;
+    border-bottom: 1px solid #e8edf5;
+    background: #f8fafc;
+}
+
+.permission-group-title {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.permission-group-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    background: #eff6ff;
+    font-size: 18px;
+}
+
+.permission-group-title h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.permission-group-title p {
+    margin: 4px 0 0;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.permission-count-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 9px;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   PERMISSION LIST
+========================================================= */
+
+.permission-list {
+    width: 100%;
+}
+
+.permission-list-heading {
+    display: grid;
+    grid-template-columns: 50px minmax(170px, 1fr) minmax(145px, 0.9fr);
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #edf1f7;
+    background: #ffffff;
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.permission-list-row {
+    display: grid;
+    grid-template-columns: 50px minmax(170px, 1fr) minmax(145px, 0.9fr);
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #edf1f7;
+    background: #ffffff;
+    transition: background 0.18s ease;
+}
+
+.permission-list-row:last-child {
+    border-bottom: none;
+}
+
+.permission-list-row:hover {
+    background: #fbfdff;
+}
+
+.permission-serial {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dbe4f0;
+    border-radius: 9px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* =========================================================
+   PERMISSION NAME
+========================================================= */
+
+.permission-name-box {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.permission-key-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #f1f5f9;
+    font-size: 14px;
+}
+
+.permission-name-box div {
+    min-width: 0;
+}
+
+.permission-name-box strong {
+    display: block;
+    overflow: hidden;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.permission-name-box small {
+    display: block;
+    margin-top: 4px;
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+/* =========================================================
+   PERMISSION SLUG
+========================================================= */
+
+.permission-slug {
+    display: inline-flex;
+    max-width: 100%;
+    padding: 7px 9px;
+    overflow: hidden;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    background: #f8fbff;
+    color: #1d4ed8;
+    font-family:
+        Consolas,
+        Monaco,
+        "Courier New",
+        monospace;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.permission-empty-state {
+    grid-column: 1 / -1;
+    padding: 55px 20px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 16px;
+    background: #f8fafc;
+    text-align: center;
+}
+
+.permission-empty-icon {
+    width: 62px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    border-radius: 18px;
+    background: #eff6ff;
+    font-size: 28px;
+}
+
+.permission-empty-state h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 18px;
+}
+
+.permission-empty-state p {
+    margin: 7px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.permission-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px 30px;
+    border-top: 1px solid #e8edf5;
+    background: #f8fafc;
+}
+
+.permission-card-footer p {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.permission-card-footer p strong {
+    color: #0f172a;
+}
+
+.permission-card-footer > span {
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+    .permission-groups-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .permission-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .permission-summary {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 700px) {
+    .permission-main-card {
+        border-radius: 15px;
+    }
+
+    .permission-page-header {
+        padding: 22px 20px;
+    }
+
+    .permission-heading {
+        align-items: flex-start;
+    }
+
+    .permission-heading-icon {
+        width: 46px;
+        height: 46px;
+    }
+
+    .permission-heading h1 {
+        font-size: 21px;
+    }
+
+    .permission-info-bar {
+        align-items: flex-start;
+        margin: 16px 20px 0;
+    }
+
+    .permission-groups-grid {
+        gap: 16px;
+        padding: 18px 20px 22px;
+    }
+
+    .permission-group-card {
+        overflow-x: auto;
+    }
+
+    .permission-group-card-header {
+        min-width: 610px;
+    }
+
+    .permission-list {
+        min-width: 610px;
+    }
+
+    .permission-card-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px 20px;
+    }
+}
+
+@media (max-width: 520px) {
+    .permission-page-header {
+        padding: 20px 16px;
+    }
+
+    .permission-heading-icon {
+        display: none;
+    }
+
+    .permission-summary {
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .permission-summary-item strong {
+        font-size: 18px;
+    }
+
+    .permission-info-bar {
+        margin-right: 16px;
+        margin-left: 16px;
+    }
+
+    .permission-groups-grid {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+}

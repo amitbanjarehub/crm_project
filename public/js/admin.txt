@@ -1,0 +1,372 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const dropdownContainer = document.getElementById('adminDropdown');
+    const dropdownButton = document.getElementById('adminDropdownBtn');
+    const dropdownMenu = document.getElementById('adminDropdownMenu');
+    const dropdownArrow = document.getElementById('dropdownArrow');
+
+    if (
+        !dropdownContainer ||
+        !dropdownButton ||
+        !dropdownMenu
+    ) {
+        return;
+    }
+
+    /*
+     * Dropdown ko topbar se nikal kar direct body me move kar rahe hain.
+     * Isse dashboard ke overflow/z-index ka koi effect nahi padega.
+     */
+    document.body.appendChild(dropdownMenu);
+
+    let isDropdownOpen = false;
+
+    function setDropdownPosition() {
+        const buttonRect = dropdownButton.getBoundingClientRect();
+
+        const menuWidth = 230;
+        const screenPadding = 12;
+
+        let leftPosition = buttonRect.right - menuWidth;
+
+        if (leftPosition < screenPadding) {
+            leftPosition = screenPadding;
+        }
+
+        if (leftPosition + menuWidth > window.innerWidth - screenPadding) {
+            leftPosition =
+                window.innerWidth - menuWidth - screenPadding;
+        }
+
+        dropdownMenu.style.top = `${buttonRect.bottom + 10}px`;
+        dropdownMenu.style.left = `${leftPosition}px`;
+        dropdownMenu.style.right = 'auto';
+    }
+
+    function openDropdown() {
+        setDropdownPosition();
+
+        dropdownMenu.classList.add('show');
+        dropdownButton.classList.add('dropdown-open');
+
+        dropdownButton.setAttribute(
+            'aria-expanded',
+            'true'
+        );
+
+        dropdownMenu.setAttribute(
+            'aria-hidden',
+            'false'
+        );
+
+        if (dropdownArrow) {
+            dropdownArrow.classList.add('rotate');
+        }
+
+        isDropdownOpen = true;
+    }
+
+    function closeDropdown() {
+        dropdownMenu.classList.remove('show');
+        dropdownButton.classList.remove('dropdown-open');
+
+        dropdownButton.setAttribute(
+            'aria-expanded',
+            'false'
+        );
+
+        dropdownMenu.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+        if (dropdownArrow) {
+            dropdownArrow.classList.remove('rotate');
+        }
+
+        isDropdownOpen = false;
+    }
+
+    dropdownButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (isDropdownOpen) {
+            closeDropdown();
+        } else {
+            openDropdown();
+        }
+    });
+
+    dropdownMenu.addEventListener('click', function (event) {
+        event.stopPropagation();
+    });
+
+    document.addEventListener('click', function (event) {
+        const clickedOnButton =
+            dropdownButton.contains(event.target);
+
+        const clickedInsideMenu =
+            dropdownMenu.contains(event.target);
+
+        if (!clickedOnButton && !clickedInsideMenu) {
+            closeDropdown();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeDropdown();
+        }
+    });
+
+    window.addEventListener('resize', function () {
+        if (isDropdownOpen) {
+            setDropdownPosition();
+        }
+    });
+
+    window.addEventListener(
+        'scroll',
+        function () {
+            if (isDropdownOpen) {
+                setDropdownPosition();
+            }
+        },
+        true
+    );
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const notificationButton =
+        document.getElementById(
+            'notificationDropdownBtn'
+        );
+
+    const notificationMenu =
+        document.getElementById(
+            'notificationDropdownMenu'
+        );
+
+    if (
+        !notificationButton
+        || !notificationMenu
+    ) {
+        return;
+    }
+
+    /*
+     * Z-index/overflow issue avoid karne ke liye
+     * dropdown ko body me move kar rahe hain.
+     */
+    document.body.appendChild(
+        notificationMenu
+    );
+
+    let isNotificationOpen = false;
+
+    function setNotificationPosition() {
+        const buttonRect =
+            notificationButton.getBoundingClientRect();
+
+        const screenPadding = 12;
+
+        const menuWidth = Math.min(
+            390,
+            window.innerWidth - (
+                screenPadding * 2
+            )
+        );
+
+        let leftPosition =
+            buttonRect.right - menuWidth;
+
+        if (leftPosition < screenPadding) {
+            leftPosition = screenPadding;
+        }
+
+        if (
+            leftPosition + menuWidth
+            > window.innerWidth - screenPadding
+        ) {
+            leftPosition =
+                window.innerWidth
+                - menuWidth
+                - screenPadding;
+        }
+
+        notificationMenu.style.width =
+            `${menuWidth}px`;
+
+        notificationMenu.style.top =
+            `${buttonRect.bottom + 10}px`;
+
+        notificationMenu.style.left =
+            `${leftPosition}px`;
+
+        notificationMenu.style.right =
+            'auto';
+    }
+
+    function closeAdminDropdown() {
+        const adminMenu =
+            document.getElementById(
+                'adminDropdownMenu'
+            );
+
+        const adminButton =
+            document.getElementById(
+                'adminDropdownBtn'
+            );
+
+        const adminArrow =
+            document.getElementById(
+                'dropdownArrow'
+            );
+
+        if (adminMenu) {
+            adminMenu.classList.remove(
+                'show'
+            );
+
+            adminMenu.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+        }
+
+        if (adminButton) {
+            adminButton.classList.remove(
+                'dropdown-open'
+            );
+
+            adminButton.setAttribute(
+                'aria-expanded',
+                'false'
+            );
+        }
+
+        if (adminArrow) {
+            adminArrow.classList.remove(
+                'rotate'
+            );
+        }
+    }
+
+    function openNotificationDropdown() {
+        closeAdminDropdown();
+        setNotificationPosition();
+
+        notificationMenu.classList.add(
+            'show'
+        );
+
+        notificationButton.classList.add(
+            'notification-open'
+        );
+
+        notificationButton.setAttribute(
+            'aria-expanded',
+            'true'
+        );
+
+        notificationMenu.setAttribute(
+            'aria-hidden',
+            'false'
+        );
+
+        isNotificationOpen = true;
+    }
+
+    function closeNotificationDropdown() {
+        notificationMenu.classList.remove(
+            'show'
+        );
+
+        notificationButton.classList.remove(
+            'notification-open'
+        );
+
+        notificationButton.setAttribute(
+            'aria-expanded',
+            'false'
+        );
+
+        notificationMenu.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+        isNotificationOpen = false;
+    }
+
+    notificationButton.addEventListener(
+        'click',
+        function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (isNotificationOpen) {
+                closeNotificationDropdown();
+            } else {
+                openNotificationDropdown();
+            }
+        }
+    );
+
+    notificationMenu.addEventListener(
+        'click',
+        function (event) {
+            event.stopPropagation();
+        }
+    );
+
+    document.addEventListener(
+        'click',
+        function (event) {
+            const clickedButton =
+                notificationButton.contains(
+                    event.target
+                );
+
+            const clickedMenu =
+                notificationMenu.contains(
+                    event.target
+                );
+
+            if (
+                !clickedButton
+                && !clickedMenu
+            ) {
+                closeNotificationDropdown();
+            }
+        }
+    );
+
+    document.addEventListener(
+        'keydown',
+        function (event) {
+            if (event.key === 'Escape') {
+                closeNotificationDropdown();
+            }
+        }
+    );
+
+    window.addEventListener(
+        'resize',
+        function () {
+            if (isNotificationOpen) {
+                setNotificationPosition();
+            }
+        }
+    );
+
+    window.addEventListener(
+        'scroll',
+        function () {
+            if (isNotificationOpen) {
+                setNotificationPosition();
+            }
+        },
+        true
+    );
+});
