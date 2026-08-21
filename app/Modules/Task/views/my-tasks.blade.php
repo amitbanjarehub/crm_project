@@ -34,6 +34,10 @@
 
             <div class="task-header-actions">
 
+                <a href="{{ route('task.kanban.index', ['my' => 1]) }}" class="secondary-btn">
+                    ▦ Kanban View
+                </a>
+
                 @if(
                                 auth()->user()->hasPermission(
                                     'tasks.export'

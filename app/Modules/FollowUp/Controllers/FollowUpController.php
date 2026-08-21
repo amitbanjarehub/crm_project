@@ -10,6 +10,7 @@ use App\Modules\User\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Support\LeadReturnUrl;
 
 class FollowUpController extends Controller
 {
@@ -130,9 +131,26 @@ class FollowUpController extends Controller
             $lead
         );
 
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route(
+                'lead.show',
+                $lead->id
+            )
+        );
+
         if ($lead->isConverted()) {
             return redirect()
-                ->route('lead.show', $lead->id)
+                ->route(
+                    'lead.show',
+                    [
+                        'lead' =>
+                            $lead->id,
+
+                        'return_url' =>
+                            $returnUrl,
+                    ]
+                )
                 ->with(
                     'error',
                     'Converted lead par new follow-up add nahi kiya ja sakta.'
@@ -143,6 +161,8 @@ class FollowUpController extends Controller
             'lead' => $lead,
             'types' => FollowUp::types(),
             'outcomes' => FollowUp::outcomes(),
+            'returnUrl' =>
+                $returnUrl,
             'pageTitle' => 'Add Follow-up',
         ]);
     }
@@ -156,12 +176,26 @@ class FollowUpController extends Controller
             $lead
         );
 
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         if ($lead->isConverted()) {
             return redirect()
-                ->route('lead.show', $lead->id)
+                ->route(
+                    'lead.show',
+                    [
+                        'lead' =>
+                            $lead->id,
+
+                        'return_url' =>
+                            $returnUrl,
+                    ]
+                )
                 ->with(
-                    'error',
-                    'Converted lead par new follow-up add nahi kiya ja sakta.'
+                    'success',
+                    'Follow-up added successfully.'
                 );
         }
 
@@ -234,11 +268,18 @@ class FollowUpController extends Controller
             $followUp
         );
 
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         return view('followup::edit', [
             'followUp' => $followUp,
             'lead' => $followUp->lead,
             'types' => FollowUp::types(),
             'outcomes' => FollowUp::outcomes(),
+            'returnUrl' =>
+                $returnUrl,
             'pageTitle' => 'Edit Follow-up',
         ]);
     }
@@ -247,6 +288,12 @@ class FollowUpController extends Controller
         Request $request,
         FollowUp $followUp
     ) {
+
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         $followUp->load('lead');
 
         $this->ensureCanModifyFollowUp(
@@ -274,14 +321,32 @@ class FollowUpController extends Controller
         });
 
         return redirect()
-            ->route('lead.show', $followUp->lead_id)
-            ->with('success', 'Follow-up updated successfully.');
+            ->route(
+                'lead.show',
+                [
+                    'lead' =>
+                        $followUp->lead_id,
+
+                    'return_url' =>
+                        $returnUrl,
+                ]
+            )
+            ->with(
+                'success',
+                'Follow-up updated successfully.'
+            );
     }
 
     public function destroy(
         Request $request,
         FollowUp $followUp
     ) {
+
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         $followUp->load('lead');
 
         $this->ensureCanModifyFollowUp(
@@ -298,8 +363,20 @@ class FollowUpController extends Controller
         });
 
         return redirect()
-            ->route('lead.show', $lead->id)
-            ->with('success', 'Follow-up deleted successfully.');
+            ->route(
+                'lead.show',
+                [
+                    'lead' =>
+                        $lead->id,
+
+                    'return_url' =>
+                        $returnUrl,
+                ]
+            )
+            ->with(
+                'success',
+                'Follow-up deleted successfully.'
+            );
     }
 
     private function validationRules(): array

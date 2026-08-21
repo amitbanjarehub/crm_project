@@ -90,6 +90,8 @@
     )
 ) }}" defer></script>
 
+
+
     <style>
         :root {
             --crm-primary:
@@ -172,7 +174,7 @@
                 $loggedInUser = auth()->user();
             @endphp
 
-            <nav class="sidebar-menu">
+            <!-- <nav class="sidebar-menu">
 
                 @if ($loggedInUser->hasPermission('dashboard.view'))
                     <a href="{{ route('admin.dashboard') }}"
@@ -311,7 +313,783 @@
                     </a>
                 @endif
 
-            </nav>
+            </nav> -->
+ 
+            @php
+    $loggedInUser = auth()->user();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Management Menu Visibility
+    |--------------------------------------------------------------------------
+    | Agar Management ke andar kam se kam ek permitted module hai,
+    | tabhi Management parent menu show hoga.
+    */
+
+    $hasManagementMenu =
+        $loggedInUser->hasPermission('users.view') ||
+        $loggedInUser->hasPermission('roles.view') ||
+        $loggedInUser->hasPermission('permissions.view') ||
+        $loggedInUser->hasPermission('leads.view') ||
+        $loggedInUser->hasPermission('follow_ups.view') ||
+        $loggedInUser->hasPermission('clients.view') ||
+        $loggedInUser->hasPermission('projects.view');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tasks Menu Visibility
+    |--------------------------------------------------------------------------
+    */
+
+    $hasTasksMenu =
+        $loggedInUser->hasPermission('tasks.view');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Time Tracking Menu Visibility
+    |--------------------------------------------------------------------------
+    */
+
+    $hasTimeTrackingMenu =
+        $loggedInUser->hasPermission(
+            'time_tracking.view_own'
+        );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reports Menu Visibility
+    |--------------------------------------------------------------------------
+    */
+
+    $hasReportsMenu =
+        $loggedInUser->hasPermission(
+            'reports.executive.view'
+        ) ||
+        $loggedInUser->hasPermission(
+            'reports.leads.view'
+        ) ||
+        $loggedInUser->hasPermission(
+            'reports.projects.view'
+        ) ||
+        $loggedInUser->hasPermission(
+            'reports.followups.view'
+        );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Active Parent Detection
+    |--------------------------------------------------------------------------
+    */
+
+    $managementActive =
+        request()->routeIs('user.*') ||
+        request()->routeIs('role.*') ||
+        request()->routeIs('permission.*') ||
+        request()->routeIs('lead.*') ||
+        request()->routeIs('followup.*') ||
+        request()->routeIs('client.*') ||
+        request()->routeIs('project.*');
+
+    $tasksActive =
+        request()->routeIs('task.*');
+
+    $timeTrackingActive =
+        request()->routeIs(
+            'timetracking.*'
+        );
+
+    $reportsActive =
+        request()->routeIs(
+            'report.executive'
+        ) ||
+        request()->routeIs(
+            'report.leads.*'
+        ) ||
+        request()->routeIs(
+            'report.projects.*'
+        ) ||
+        request()->routeIs(
+            'report.followups.*'
+        );
+@endphp
+
+
+<nav class="sidebar-menu">
+
+    {{-- =====================================================
+         DASHBOARD
+    ====================================================== --}}
+
+    @if(
+        $loggedInUser->hasPermission(
+            'dashboard.view'
+        )
+    )
+
+        <a
+            href="{{ route('admin.dashboard') }}"
+            class="
+                sidebar-main-link
+                {{ request()->routeIs('admin.dashboard')
+                    ? 'active'
+                    : '' }}
+            "
+        >
+            <span class="sidebar-menu-icon">
+                📊
+            </span>
+
+            <span class="sidebar-menu-label">
+                Dashboard
+            </span>
+        </a>
+
+    @endif
+
+
+    {{-- =====================================================
+         MANAGEMENT
+    ====================================================== --}}
+
+    @if($hasManagementMenu)
+
+        <div
+            class="
+               sidebar-menu-group
+                {{ $managementActive
+                    ? 'is-active'
+                    : '' }}
+            "
+            data-sidebar-group="management"
+        >
+
+            <button
+                type="button"
+                class="
+                    sidebar-group-toggle
+                    {{ $managementActive
+                        ? 'active'
+                        : '' }}
+                "
+                aria-expanded="{{ $managementActive
+                    ? 'true'
+                    : 'false' }}"
+                aria-controls="sidebar-management-menu"
+            >
+
+                <span class="sidebar-group-left">
+
+                    <span class="sidebar-menu-icon">
+                        ⚙️
+                    </span>
+
+                    <span class="sidebar-menu-label">
+                        Management
+                    </span>
+
+                </span>
+
+                <span
+                    class="sidebar-chevron"
+                    aria-hidden="true"
+                >
+                    ▾
+                </span>
+
+            </button>
+
+
+            <div
+                id="sidebar-management-menu"
+                class="sidebar-submenu"
+                {{ $managementActive
+                    ? ''
+                    : 'hidden' }}
+            >
+
+                {{-- User Management --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'users.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route('user.index') }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs('user.*')
+                                ? 'active'
+                                : '' }}
+                        "
+                    >
+                        <span>👥</span>
+
+                        <span>
+                            User Management
+                        </span>
+                    </a>
+
+                @endif
+
+
+                {{-- Role Management --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'roles.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route('role.index') }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs('role.*')
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>🛡️</span>
+
+                        <span>
+                            Role Management
+                        </span>
+                    </a>
+
+                @endif
+
+
+                {{-- Permission Management --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'permissions.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route(
+                            'permission.index'
+                        ) }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs(
+                                'permission.*'
+                            )
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>🔐</span>
+
+                        <span>
+                            Permission Management
+                        </span>
+                    </a>
+
+                @endif
+
+
+                {{-- Lead Management --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'leads.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route('lead.index') }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs('lead.*')
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>📌</span>
+
+                        <span>
+                            Lead Management
+                        </span>
+                    </a>
+
+                @endif
+
+
+                {{-- Follow-up Management --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'follow_ups.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route(
+                            'followup.index'
+                        ) }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs(
+                                'followup.*'
+                            )
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>📞</span>
+
+                        <span>
+                            Follow-up Management
+                        </span>
+                    </a>
+
+                @endif
+
+
+                {{-- Client Management --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'clients.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route(
+                            'client.index'
+                        ) }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs(
+                                'client.*'
+                            )
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>🏢</span>
+
+                        <span>
+                            Client Management
+                        </span>
+                    </a>
+
+                @endif
+
+
+                {{-- Project Management --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'projects.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route(
+                            'project.index'
+                        ) }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs(
+                                'project.*'
+                            )
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>📁</span>
+
+                        <span>
+                            Project Management
+                        </span>
+                    </a>
+
+                @endif
+
+            </div>
+
+        </div>
+
+    @endif
+
+
+    {{-- =====================================================
+         TASKS
+    ====================================================== --}}
+
+    @if($hasTasksMenu)
+
+        <div
+            class="
+                sidebar-menu-group
+                {{ $tasksActive
+                    ? 'is-active'
+                    : '' }}
+            "
+            data-sidebar-group="tasks"
+        >
+
+            <button
+                type="button"
+                class="sidebar-group-toggle"
+                aria-expanded="{{ $tasksActive
+                    ? 'true'
+                    : 'false' }}"
+                aria-controls="sidebar-tasks-menu"
+            >
+
+                <span class="sidebar-group-left">
+
+                    <span class="sidebar-menu-icon">
+                        ✅
+                    </span>
+
+                    <span class="sidebar-menu-label">
+                        Tasks
+                    </span>
+
+                </span>
+
+                <span
+                    class="sidebar-chevron"
+                    aria-hidden="true"
+                >
+                    ▾
+                </span>
+
+            </button>
+
+
+            <div
+                id="sidebar-tasks-menu"
+                class="sidebar-submenu"
+                {{ $tasksActive
+                    ? ''
+                    : 'hidden' }}
+            >
+
+                <a
+                    href="{{ route('task.my') }}"
+                    class="
+                        sidebar-submenu-link
+                        {{ request()->routeIs('task.*')
+                            ? 'active'
+                            : '' }}
+                    "
+                >
+                    <span>✅</span>
+
+                    <span>
+                        My Tasks
+                    </span>
+                </a>
+
+            </div>
+
+        </div>
+
+    @endif
+
+
+    {{-- =====================================================
+         TIME & ATTENDANCE
+    ====================================================== --}}
+
+    @if($hasTimeTrackingMenu)
+
+        <div
+            class="
+                sidebar-menu-group
+                {{ $timeTrackingActive
+                    ? 'is-active'
+                    : '' }}
+            "
+            data-sidebar-group="time-tracking"
+        >
+
+            <button
+                type="button"
+                class="sidebar-group-toggle"
+                aria-expanded="{{ $timeTrackingActive
+                    ? 'true'
+                    : 'false' }}"
+                aria-controls="sidebar-time-tracking-menu"
+            >
+
+                <span class="sidebar-group-left">
+
+                    <span class="sidebar-menu-icon">
+                        ⏱️
+                    </span>
+
+                    <span class="sidebar-menu-label">
+                        Time & Attendance
+                    </span>
+
+                </span>
+
+                <span
+                    class="sidebar-chevron"
+                    aria-hidden="true"
+                >
+                    ▾
+                </span>
+
+            </button>
+
+
+            <div
+                id="sidebar-time-tracking-menu"
+                class="sidebar-submenu"
+                {{ $timeTrackingActive
+                    ? ''
+                    : 'hidden' }}
+            >
+
+                <a
+                    href="{{ route(
+                        'timetracking.index'
+                    ) }}"
+                    class="
+                        sidebar-submenu-link
+                        {{ request()->routeIs(
+                            'timetracking.*'
+                        )
+                            ? 'active'
+                            : '' }}
+                    "
+                >
+                    <span>⏱️</span>
+
+                    <span>
+                        Time Tracking
+                    </span>
+                </a>
+
+            </div>
+
+        </div>
+
+    @endif
+
+
+    {{-- =====================================================
+         REPORTS
+    ====================================================== --}}
+
+    @if($hasReportsMenu)
+
+        <div
+            class="
+                sidebar-menu-group
+                {{ $reportsActive
+                    ? 'is-active'
+                    : '' }}
+            "
+            data-sidebar-group="reports"
+        >
+
+            <button
+                type="button"
+                class="
+                    sidebar-group-toggle
+                    {{ $reportsActive
+                        ? 'active'
+                        : '' }}
+                "
+                aria-expanded="{{ $reportsActive
+                    ? 'true'
+                    : 'false' }}"
+                aria-controls="sidebar-reports-menu"
+            >
+
+                <span class="sidebar-group-left">
+
+                    <span class="sidebar-menu-icon">
+                        📈
+                    </span>
+
+                    <span class="sidebar-menu-label">
+                        Reports
+                    </span>
+
+                </span>
+
+                <span
+                    class="sidebar-chevron"
+                    aria-hidden="true"
+                >
+                    ▾
+                </span>
+
+            </button>
+
+
+            <div
+                id="sidebar-reports-menu"
+                class="sidebar-submenu"
+                {{ $reportsActive
+                    ? ''
+                    : 'hidden' }}
+            >
+
+                {{-- Executive Reports --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'reports.executive.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route(
+                            'report.executive'
+                        ) }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs(
+                                'report.executive'
+                            )
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>📊</span>
+
+                        <span>
+                            Executive Reports
+                        </span>
+                    </a>
+
+                @endif
+
+
+                {{-- Lead Reports --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'reports.leads.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route(
+                            'report.leads.index'
+                        ) }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs(
+                                'report.leads.*'
+                            )
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>📌</span>
+
+                        <span>
+                            Lead Reports
+                        </span>
+                    </a>
+
+                @endif
+
+
+                {{-- Project Reports --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'reports.projects.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route(
+                            'report.projects.index'
+                        ) }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs(
+                                'report.projects.*'
+                            )
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>📈</span>
+
+                        <span>
+                            Project Reports
+                        </span>
+                    </a>
+
+                @endif
+
+
+                {{-- Follow-up Reports --}}
+                @if(
+                    $loggedInUser->hasPermission(
+                        'reports.followups.view'
+                    )
+                )
+
+                    <a
+                        href="{{ route(
+                            'report.followups.index'
+                        ) }}"
+                        class="
+                            sidebar-submenu-link
+                            {{ request()->routeIs(
+                                'report.followups.*'
+                            )
+                                ? 'active'
+                                : '' }}
+                    "
+                    >
+                        <span>📞</span>
+
+                        <span>
+                            Follow-up Reports
+                        </span>
+                    </a>
+
+                @endif
+
+            </div>
+
+        </div>
+
+    @endif
+
+
+    {{-- =====================================================
+         SETTINGS
+         Direct Main Menu
+    ====================================================== --}}
+
+    @if(
+        $loggedInUser->hasPermission(
+            'settings.view'
+        )
+    )
+
+        <a
+            href="{{ route('setting.index') }}"
+            class="
+                sidebar-main-link
+                {{ request()->routeIs('setting.*')
+                    ? 'active'
+                    : '' }}
+            "
+        >
+            <span class="sidebar-menu-icon">
+                ⚙️
+            </span>
+
+            <span class="sidebar-menu-label">
+                Settings
+            </span>
+        </a>
+
+    @endif
+
+</nav>
+ 
         </aside>
 
         <!-- Main -->

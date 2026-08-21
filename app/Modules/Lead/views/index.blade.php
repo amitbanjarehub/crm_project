@@ -19,6 +19,9 @@
             $priority !== '' ||
             $source !== '' ||
             $assignedTo > 0;
+
+        $leadReturnUrl =
+            request()->fullUrl();
     @endphp
 
     <div class="content-card">
@@ -101,6 +104,15 @@
 
             <div class="lead-header-actions">
 
+                <a
+                    href="{{ route(
+                        'lead.kanban.index'
+                    ) }}"
+                    class="secondary-btn"
+                >
+                    Kanban View
+                </a>
+
                 @if(
                                 auth()->user()->hasPermission(
                                     'leads.import'
@@ -149,8 +161,12 @@
                                 )
                             )
                             <a href="{{ route(
-                        'lead.create'
-                    ) }}" class="primary-btn">
+    'lead.create',
+    [
+        'return_url' =>
+            $leadReturnUrl,
+    ]
+) }}" class="primary-btn">
                                 + Add Lead
                             </a>
                 @endif
@@ -384,6 +400,11 @@
             class="status-update-form"
         >
             @csrf
+            <input
+                type="hidden"
+                name="return_url"
+                value="{{ $leadReturnUrl }}"
+            >
             @method('PATCH')
 
             <select
@@ -466,17 +487,49 @@
                                 <td>
                                     <div class="lead-actions">
 
-                                        <a href="{{ route('lead.show', $lead->id) }}" class="table-btn view">
+                                        <!-- <a href="{{ route('lead.show', $lead->id) }}" class="table-btn view">
                                             View
-                                        </a>
+                                        </a> -->
+
+                                        <a
+    href="{{ route(
+        'lead.show',
+        [
+            'lead' =>
+                $lead->id,
+
+            'return_url' =>
+                $leadReturnUrl,
+        ]
+    ) }}"
+    class="table-btn view"
+>
+    View
+</a>
 
                                         @if(
                                                 !$lead->isConverted()
                                                 && auth()->user()->hasPermission('follow_ups.create')
                                             )
-                                            <a href="{{ route('followup.create', $lead->id) }}" class="table-btn followup">
+                                            <!-- <a href="{{ route('followup.create', $lead->id) }}" class="table-btn followup">
                                                 Follow-up
-                                            </a>
+                                            </a> -->
+
+                                            <a
+    href="{{ route(
+        'followup.create',
+        [
+            'lead' =>
+                $lead->id,
+
+            'return_url' =>
+                $leadReturnUrl,
+        ]
+    ) }}"
+    class="table-btn followup"
+>
+    Follow-up
+</a>
                                         @endif
 
                                         @if(
@@ -486,6 +539,11 @@
                                             <form action="{{ route('lead.convert', $lead->id) }}" method="POST"
                                                 onsubmit="return confirm('Convert this lead into a client?');">
                                                 @csrf
+                                                <input
+                                                    type="hidden"
+                                                    name="return_url"
+                                                    value="{{ $leadReturnUrl }}"
+                                                >
 
                                                 <button type="submit" class="table-btn convert">
                                                     Convert
@@ -497,9 +555,25 @@
                                                 !$lead->isConverted()
                                                 && auth()->user()->hasPermission('leads.edit')
                                             )
-                                            <a href="{{ route('lead.edit', $lead->id) }}" class="table-btn edit">
+                                            <!-- <a href="{{ route('lead.edit', $lead->id) }}" class="table-btn edit">
                                                 Edit
-                                            </a>
+                                            </a> -->
+
+                                            <a
+    href="{{ route(
+        'lead.edit',
+        [
+            'lead' =>
+                $lead->id,
+
+            'return_url' =>
+                $leadReturnUrl,
+        ]
+    ) }}"
+    class="table-btn edit"
+>
+    Edit
+</a>
                                         @endif
 
                                         @if(
@@ -509,6 +583,11 @@
                                             <form action="{{ route('lead.destroy', $lead->id) }}" method="POST" class="delete-form"
                                                 onsubmit="return confirm('Are you sure you want to delete this lead?');">
                                                 @csrf
+                                                <input
+                                                    type="hidden"
+                                                    name="return_url"
+                                                    value="{{ $leadReturnUrl }}"
+                                                >
                                                 @method('DELETE')
 
                                                 <button type="submit" class="table-btn delete">

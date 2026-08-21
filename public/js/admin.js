@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const menuWidth = Math.min(
             preferredWidth,
             window.innerWidth
-                - (screenPadding * 2)
+            - (screenPadding * 2)
         );
 
         let leftPosition =
@@ -415,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const pollingInterval =
         Number.isFinite(parsedInterval)
-        && parsedInterval >= 3000
+            && parsedInterval >= 3000
             ? parsedInterval
             : 4000;
 
@@ -1047,5 +1047,85 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener(
         'focus',
         pollNotifications
+    );
+
+    /*
+ * =====================================================
+ * SIDEBAR COLLAPSIBLE MENUS
+ * =====================================================
+ */
+
+    const sidebarGroupToggles =
+        document.querySelectorAll(
+            '.sidebar-group-toggle'
+        );
+
+    sidebarGroupToggles.forEach(
+        function (toggle) {
+
+            toggle.addEventListener(
+                'click',
+                function () {
+
+                    const group =
+                        toggle.closest(
+                            '.sidebar-menu-group'
+                        );
+
+                    if (!group) {
+                        return;
+                    }
+
+                    const submenu =
+                        group.querySelector(
+                            '.sidebar-submenu'
+                        );
+
+                    if (!submenu) {
+                        return;
+                    }
+
+                    const isOpen =
+                        toggle.getAttribute(
+                            'aria-expanded'
+                        ) === 'true';
+
+                    /*
+                     * Toggle current submenu.
+                     */
+                    if (isOpen) {
+
+                        toggle.setAttribute(
+                            'aria-expanded',
+                            'false'
+                        );
+
+                        submenu.hidden =
+                            true;
+
+                        group.classList.remove(
+                            'is-open'
+                        );
+
+                    } else {
+
+                        toggle.setAttribute(
+                            'aria-expanded',
+                            'true'
+                        );
+
+                        submenu.hidden =
+                            false;
+
+                        group.classList.add(
+                            'is-open'
+                        );
+
+                    }
+
+                }
+            );
+
+        }
     );
 });

@@ -8,6 +8,7 @@ use App\Modules\User\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use App\Support\LeadReturnUrl;
 
 class ClientController extends Controller
 {
@@ -139,6 +140,11 @@ class ClientController extends Controller
             $client
         );
 
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('client.index')
+        );
+
         $client->load([
             'assignedUser:id,name,email',
             'creator:id,name,email',
@@ -149,6 +155,8 @@ class ClientController extends Controller
         return view('client::show', [
             'client' => $client,
             'statuses' => Client::statuses(),
+            'returnUrl' =>
+                $returnUrl,
             'pageTitle' => 'Client Details',
         ]);
     }

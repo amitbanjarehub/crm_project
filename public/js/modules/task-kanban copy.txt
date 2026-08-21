@@ -1,0 +1,1722 @@
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+        'use strict';
+
+        const app =
+            document.getElementById(
+                'taskKanbanApp'
+            );
+
+        if (!app) {
+            return;
+        }
+
+        const boardContainer =
+            document.getElementById(
+                'taskKanbanBoardContainer'
+            );
+
+        const filterForm =
+            document.getElementById(
+                'taskKanbanFilterForm'
+            );
+
+        const groupBy =
+            document.getElementById(
+                'taskKanbanGroupBy'
+            );
+
+        const searchInput =
+            document.getElementById(
+                'taskKanbanSearch'
+            );
+
+        const statusFilter =
+            document.getElementById(
+                'taskKanbanStatus'
+            );
+
+        const priorityFilter =
+            document.getElementById(
+                'taskKanbanPriority'
+            );
+
+        const dueFilter =
+            document.getElementById(
+                'taskKanbanDue'
+            );
+
+        const hideEmpty =
+            document.getElementById(
+                'taskKanbanHideEmpty'
+            );
+
+        const refreshButton =
+            document.getElementById(
+                'taskKanbanRefresh'
+            );
+
+        const resetButton =
+            document.getElementById(
+                'taskKanbanReset'
+            );
+
+        const undoButton =
+            document.getElementById(
+                'taskKanbanUndo'
+            );
+
+        const savingState =
+            document.getElementById(
+                'taskKanbanSavingState'
+            );
+
+        const totalTasks =
+            document.getElementById(
+                'taskKanbanTotal'
+            );
+
+        const updatedAt =
+            document.getElementById(
+                'taskKanbanUpdated'
+            );
+
+        const drawerOverlay =
+            document.getElementById(
+                'taskKanbanDrawerOverlay'
+            );
+
+        const drawer =
+            document.getElementById(
+                'taskKanbanDrawer'
+            );
+
+        const toastContainer =
+            document.getElementById(
+                'taskKanbanToastContainer'
+            );
+
+        const csrfToken =
+            document
+                .querySelector(
+                    'meta[name="csrf-token"]'
+                )
+                ?.getAttribute(
+                    'content'
+                );
+
+        let draggedCard = null;
+        let cardSnapshot = null;
+        let cardDropHandled = false;
+
+        let draggedColumn = null;
+        let columnSnapshot = null;
+        let columnDropHandled = false;
+
+        let isDragging = false;
+        let pendingRequests = 0;
+        let searchTimer = null;
+        let refreshTimer = null;
+        let lastUndo = null;
+        let selectedCard = null;
+
+        function replaceTask(
+            template,
+            taskId
+        ) {
+            return template.replace(
+                '__TASK__',
+                String(taskId)
+            );
+        }
+
+        function updateSavingState(
+            text,
+            state
+        ) {
+            if (!savingState) {
+                return;
+            }
+
+            savingState.textContent =
+                text;
+
+            savingState.className =
+                'task-kanban-saving ' +
+                state;
+        }
+
+        async function apiRequest(
+            url,
+            options = {}
+        ) {
+            pendingRequests++;
+
+            updateSavingState(
+                'Saving...',
+                'saving'
+            );
+
+            try {
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method:
+                                options.method
+                                || 'GET',
+
+                            headers: {
+                                Accept:
+                                    'application/json',
+
+                                'Content-Type':
+                                    'application/json',
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest',
+
+                                'X-CSRF-TOKEN':
+                                    csrfToken,
+                            },
+
+                            body:
+                                options.body
+                                    ? JSON.stringify(
+                                        options.body
+                                    )
+                                    : undefined,
+                        }
+                    );
+
+                let payload = {};
+
+                try {
+                    payload =
+                        await response.json();
+                } catch (error) {
+                    payload = {};
+                }
+
+                if (!response.ok) {
+                    const message =
+                        payload.message
+                            || payload.errors
+                            ? Object.values(
+                                payload.errors || {}
+                            ).flat()[0]
+                            || payload.message
+                            || 'Request failed.'
+                            : 'Request failed.';
+
+                    const error =
+                        new Error(
+                            message
+                        );
+
+                    error.status =
+                        response.status;
+
+                    throw error;
+                }
+
+                return payload;
+            } finally {
+                pendingRequests =
+                    Math.max(
+                        0,
+                        pendingRequests - 1
+                    );
+
+                if (
+                    pendingRequests === 0
+                ) {
+                    updateSavingState(
+                        'Saved',
+                        'saved'
+                    );
+                }
+            }
+        }
+
+        function showToast(
+            message,
+            type = 'success'
+        ) {
+            if (!toastContainer) {
+                return;
+            }
+
+            const toast =
+                document.createElement(
+                    'div'
+                );
+
+            toast.className =
+                'task-kanban-toast ' +
+                type;
+
+            toast.textContent =
+                message;
+
+            toastContainer.appendChild(
+                toast
+            );
+
+            requestAnimationFrame(
+                function () {
+                    toast.classList.add(
+                        'show'
+                    );
+                }
+            );
+
+            setTimeout(
+                function () {
+                    toast.classList.remove(
+                        'show'
+                    );
+
+                    setTimeout(
+                        function () {
+                            toast.remove();
+                        },
+                        250
+                    );
+                },
+                3500
+            );
+        }
+
+        function currentBoard() {
+            return document.getElementById(
+                'taskKanbanBoard'
+            );
+        }
+
+        function buildQueryUrl() {
+            const url =
+                new URL(
+                    app.dataset.boardUrl,
+                    window.location.origin
+                );
+
+            const formData =
+                new FormData(
+                    filterForm
+                );
+
+            formData.forEach(
+                function (
+                    value,
+                    key
+                ) {
+                    const cleaned =
+                        String(value).trim();
+
+                    if (cleaned !== '') {
+                        url.searchParams.set(
+                            key,
+                            cleaned
+                        );
+                    }
+                }
+            );
+
+            url.searchParams.set(
+                'group_by',
+                groupBy.value
+            );
+
+            return url;
+        }
+
+        function updateBrowserUrl() {
+            const url =
+                new URL(
+                    window.location.href
+                );
+
+            [
+                'group_by',
+                'search',
+                'status',
+                'priority',
+                'due',
+            ].forEach(
+                function (key) {
+                    url.searchParams.delete(
+                        key
+                    );
+                }
+            );
+
+            const formData =
+                new FormData(
+                    filterForm
+                );
+
+            formData.forEach(
+                function (
+                    value,
+                    key
+                ) {
+                    const cleaned =
+                        String(value).trim();
+
+                    if (cleaned !== '') {
+                        url.searchParams.set(
+                            key,
+                            cleaned
+                        );
+                    }
+                }
+            );
+
+            url.searchParams.set(
+                'group_by',
+                groupBy.value
+            );
+
+            window.history.replaceState(
+                {},
+                '',
+                url
+            );
+        }
+
+        async function refreshBoard(
+            silent = false
+        ) {
+            if (
+                isDragging
+                || pendingRequests > 0
+            ) {
+                return;
+            }
+
+            if (!silent) {
+                boardContainer.classList.add(
+                    'is-loading'
+                );
+            }
+
+            try {
+                const response =
+                    await fetch(
+                        buildQueryUrl(),
+                        {
+                            headers: {
+                                Accept:
+                                    'application/json',
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest',
+                            },
+                        }
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        'Unable to refresh Task Kanban board.'
+                    );
+                }
+
+                const payload =
+                    await response.json();
+
+                closeDrawer();
+
+                boardContainer.innerHTML =
+                    payload.html;
+
+                if (totalTasks) {
+                    totalTasks.textContent =
+                        payload.total;
+                }
+
+                if (updatedAt) {
+                    updatedAt.textContent =
+                        payload.updated_at;
+                }
+
+                updateBrowserUrl();
+
+                if (!silent) {
+                    showToast(
+                        'Task Kanban board refreshed.'
+                    );
+                }
+            } catch (error) {
+                if (!silent) {
+                    showToast(
+                        error.message,
+                        'error'
+                    );
+                }
+            } finally {
+                boardContainer.classList.remove(
+                    'is-loading'
+                );
+            }
+        }
+
+        function previousTaskId(
+            card
+        ) {
+            let element =
+                card.previousElementSibling;
+
+            while (element) {
+                if (
+                    element.classList.contains(
+                        'task-kanban-card'
+                    )
+                ) {
+                    return Number(
+                        element.dataset.taskId
+                    );
+                }
+
+                element =
+                    element.previousElementSibling;
+            }
+
+            return null;
+        }
+
+        function nextTaskId(
+            card
+        ) {
+            let element =
+                card.nextElementSibling;
+
+            while (element) {
+                if (
+                    element.classList.contains(
+                        'task-kanban-card'
+                    )
+                ) {
+                    return Number(
+                        element.dataset.taskId
+                    );
+                }
+
+                element =
+                    element.nextElementSibling;
+            }
+
+            return null;
+        }
+
+        function getCardAfterElement(
+            container,
+            mouseY
+        ) {
+            const cards =
+                Array.from(
+                    container.querySelectorAll(
+                        '.task-kanban-card:not(.dragging)'
+                    )
+                );
+
+            return cards.reduce(
+                function (
+                    closest,
+                    child
+                ) {
+                    const box =
+                        child.getBoundingClientRect();
+
+                    const offset =
+                        mouseY
+                        - box.top
+                        - box.height / 2;
+
+                    if (
+                        offset < 0
+                        && offset
+                        > closest.offset
+                    ) {
+                        return {
+                            offset,
+                            element:
+                                child,
+                        };
+                    }
+
+                    return closest;
+                },
+                {
+                    offset:
+                        Number.NEGATIVE_INFINITY,
+
+                    element:
+                        null,
+                }
+            ).element;
+        }
+
+        function getColumnAfterElement(
+            board,
+            mouseX
+        ) {
+            const columns =
+                Array.from(
+                    board.querySelectorAll(
+                        '.task-kanban-column:not(.column-dragging)'
+                    )
+                );
+
+            return columns.reduce(
+                function (
+                    closest,
+                    column
+                ) {
+                    const box =
+                        column.getBoundingClientRect();
+
+                    const offset =
+                        mouseX
+                        - box.left
+                        - box.width / 2;
+
+                    if (
+                        offset < 0
+                        && offset
+                        > closest.offset
+                    ) {
+                        return {
+                            offset,
+                            element:
+                                column,
+                        };
+                    }
+
+                    return closest;
+                },
+                {
+                    offset:
+                        Number.NEGATIVE_INFINITY,
+
+                    element:
+                        null,
+                }
+            ).element;
+        }
+
+        function updateColumnCounts() {
+            document
+                .querySelectorAll(
+                    '.task-kanban-column'
+                )
+                .forEach(
+                    function (column) {
+                        const list =
+                            column.querySelector(
+                                '.task-kanban-card-list'
+                            );
+
+                        const cards =
+                            list
+                                ? list.querySelectorAll(
+                                    '.task-kanban-card'
+                                )
+                                : [];
+
+                        const count =
+                            column.querySelector(
+                                '.task-kanban-column-count'
+                            );
+
+                        if (count) {
+                            count.textContent =
+                                cards.length;
+                        }
+
+                        if (
+                            cards.length === 0
+                            && list
+                            && !list.querySelector(
+                                '.task-kanban-empty-column'
+                            )
+                        ) {
+                            const empty =
+                                document.createElement(
+                                    'div'
+                                );
+
+                            empty.className =
+                                'task-kanban-empty-column';
+
+                            empty.textContent =
+                                'Drop a Task here';
+
+                            list.appendChild(
+                                empty
+                            );
+                        }
+
+                        if (
+                            cards.length > 0
+                        ) {
+                            list
+                                ?.querySelector(
+                                    '.task-kanban-empty-column'
+                                )
+                                ?.remove();
+                        }
+                    }
+                );
+        }
+
+        function restoreCard(
+            card,
+            snapshot
+        ) {
+            if (
+                !card
+                || !snapshot
+                || !snapshot.parent
+            ) {
+                return;
+            }
+
+            if (
+                snapshot.nextSibling
+                && snapshot.nextSibling.parentNode
+                === snapshot.parent
+            ) {
+                snapshot.parent.insertBefore(
+                    card,
+                    snapshot.nextSibling
+                );
+            } else {
+                snapshot.parent.appendChild(
+                    card
+                );
+            }
+
+            updateColumnCounts();
+        }
+
+        document.addEventListener(
+            'dragstart',
+            function (event) {
+                const cardHandle =
+                    event.target.closest(
+                        '.task-kanban-card-handle'
+                    );
+
+                if (cardHandle) {
+                    draggedCard =
+                        cardHandle.closest(
+                            '.task-kanban-card'
+                        );
+
+                    if (!draggedCard) {
+                        return;
+                    }
+
+                    cardSnapshot = {
+                        parent:
+                            draggedCard.parentElement,
+
+                        nextSibling:
+                            draggedCard.nextElementSibling,
+
+                        column:
+                            draggedCard
+                                .parentElement
+                                .dataset
+                                .columnSlug,
+                    };
+
+                    cardDropHandled =
+                        false;
+
+                    isDragging = true;
+
+                    draggedCard.classList.add(
+                        'dragging'
+                    );
+
+                    event.dataTransfer.effectAllowed =
+                        'move';
+
+                    event.dataTransfer.setData(
+                        'text/plain',
+                        draggedCard.dataset.taskId
+                    );
+
+                    return;
+                }
+
+                const columnHandle =
+                    event.target.closest(
+                        '.task-kanban-column-handle'
+                    );
+
+                if (columnHandle) {
+                    draggedColumn =
+                        columnHandle.closest(
+                            '.task-kanban-column'
+                        );
+
+                    if (!draggedColumn) {
+                        return;
+                    }
+
+                    columnSnapshot = {
+                        parent:
+                            draggedColumn.parentElement,
+
+                        nextSibling:
+                            draggedColumn.nextElementSibling,
+                    };
+
+                    columnDropHandled =
+                        false;
+
+                    isDragging = true;
+
+                    draggedColumn.classList.add(
+                        'column-dragging'
+                    );
+
+                    event.dataTransfer.effectAllowed =
+                        'move';
+
+                    event.dataTransfer.setData(
+                        'text/plain',
+                        draggedColumn.dataset.columnSlug
+                    );
+                }
+            }
+        );
+
+        document.addEventListener(
+            'dragover',
+            function (event) {
+                if (draggedCard) {
+                    const list =
+                        event.target.closest(
+                            '.task-kanban-card-list'
+                        );
+
+                    if (!list) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    list
+                        .querySelector(
+                            '.task-kanban-empty-column'
+                        )
+                        ?.remove();
+
+                    const after =
+                        getCardAfterElement(
+                            list,
+                            event.clientY
+                        );
+
+                    if (!after) {
+                        list.appendChild(
+                            draggedCard
+                        );
+                    } else {
+                        list.insertBefore(
+                            draggedCard,
+                            after
+                        );
+                    }
+
+                    return;
+                }
+
+                if (draggedColumn) {
+                    const board =
+                        currentBoard();
+
+                    if (!board) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const after =
+                        getColumnAfterElement(
+                            board,
+                            event.clientX
+                        );
+
+                    if (!after) {
+                        board.appendChild(
+                            draggedColumn
+                        );
+                    } else {
+                        board.insertBefore(
+                            draggedColumn,
+                            after
+                        );
+                    }
+                }
+            }
+        );
+
+        document.addEventListener(
+            'drop',
+            async function (event) {
+                if (draggedCard) {
+                    const list =
+                        event.target.closest(
+                            '.task-kanban-card-list'
+                        );
+
+                    if (!list) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    cardDropHandled =
+                        true;
+
+                    updateColumnCounts();
+
+                    await persistCardMove(
+                        draggedCard,
+                        list,
+                        cardSnapshot
+                    );
+
+                    return;
+                }
+
+                if (draggedColumn) {
+                    const board =
+                        currentBoard();
+
+                    if (!board) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    columnDropHandled =
+                        true;
+
+                    const columns =
+                        Array.from(
+                            board.querySelectorAll(
+                                '.task-kanban-column'
+                            )
+                        ).map(
+                            function (column) {
+                                return column.dataset
+                                    .columnSlug;
+                            }
+                        );
+
+                    try {
+                        await apiRequest(
+                            app.dataset
+                                .columnOrderUrl,
+                            {
+                                method:
+                                    'PUT',
+
+                                body: {
+                                    group_by:
+                                        groupBy.value,
+
+                                    columns,
+                                },
+                            }
+                        );
+
+                        showToast(
+                            'Column order saved.'
+                        );
+                    } catch (error) {
+                        restoreColumn();
+                        showToast(
+                            error.message,
+                            'error'
+                        );
+                    }
+                }
+            }
+        );
+
+        function applyTaskResponse(card, task) {
+            if (!card || !task) {
+                return;
+            }
+
+            /*
+             * Update card data attributes
+             */
+            if (task.status !== undefined) {
+                card.dataset.status =
+                    task.status;
+            }
+
+            if (task.priority !== undefined) {
+                card.dataset.priority =
+                    task.priority;
+            }
+
+            /*
+             * Status badge
+             */
+            const statusBadge =
+                card.querySelector(
+                    '.task-kanban-card-status'
+                );
+
+            if (statusBadge) {
+                if (
+                    typeof task.status === 'object'
+                    && task.status !== null
+                ) {
+                    statusBadge.textContent =
+                        task.status.name
+                        || task.status.label
+                        || '';
+
+                    if (task.status.color) {
+                        statusBadge.style.setProperty(
+                            '--kanban-badge-color',
+                            task.status.color
+                        );
+                    }
+                } else {
+                    statusBadge.textContent =
+                        String(
+                            task.status || ''
+                        );
+                }
+            }
+
+            /*
+             * Priority badge
+             */
+            const priorityBadge =
+                card.querySelector(
+                    '.task-kanban-card-priority'
+                );
+
+            if (priorityBadge) {
+                if (
+                    typeof task.priority === 'object'
+                    && task.priority !== null
+                ) {
+                    priorityBadge.textContent =
+                        task.priority.name
+                        || task.priority.label
+                        || '';
+
+                    if (task.priority.color) {
+                        priorityBadge.style.setProperty(
+                            '--kanban-badge-color',
+                            task.priority.color
+                        );
+                    }
+                } else {
+                    priorityBadge.textContent =
+                        String(
+                            task.priority || ''
+                        );
+                }
+            }
+
+            /*
+             * Remove saving/blur state immediately
+             */
+            card.classList.remove(
+                'saving'
+            );
+        }
+
+        
+
+
+        function updateTaskCardVisualState(
+            card,
+            targetColumn,
+            task = null
+        ) {
+            if (!card) {
+                return;
+            }
+
+            /*
+             * Remove any temporary saving state.
+             */
+            card.classList.remove(
+                'saving'
+            );
+
+            /*
+             * Store current column.
+             */
+            card.dataset.columnSlug =
+                targetColumn;
+
+            /*
+             * If server returned task data,
+             * update status and priority.
+             */
+            if (task) {
+                if (
+                    task.status !== undefined
+                ) {
+                    card.dataset.status =
+                        task.status;
+                }
+
+                if (
+                    task.priority !== undefined
+                ) {
+                    card.dataset.priority =
+                        task.priority;
+                }
+            }
+
+            /*
+             * Update status badge if card contains one.
+             *
+             * IMPORTANT:
+             * Your Blade should use:
+             *
+             * data-task-status
+             *
+             * or
+             *
+             * .task-kanban-status-badge
+             *
+             * if you want dynamic badge text.
+             */
+            const statusBadge =
+                card.querySelector(
+                    '[data-task-status]'
+                );
+
+            if (
+                statusBadge
+                && task
+                && task.status !== undefined
+            ) {
+                statusBadge.textContent =
+                    task.status;
+            }
+
+            /*
+             * Update priority badge.
+             */
+            const priorityBadge =
+                card.querySelector(
+                    '[data-task-priority]'
+                );
+
+            if (
+                priorityBadge
+                && task
+                && task.priority !== undefined
+            ) {
+                priorityBadge.textContent =
+                    task.priority;
+            }
+        }
+
+
+        async function persistCardMove(
+            card,
+            targetList,
+            snapshot
+        ) {
+            const taskId =
+                Number(
+                    card.dataset.taskId
+                );
+
+            const targetColumn =
+                targetList.dataset.columnSlug;
+
+            /*
+             * IMPORTANT:
+             * Card ko saving/blur state me mat rakho.
+             * Drop hote hi card normal UI me visible rahega.
+             */
+            card.classList.remove(
+                'saving'
+            );
+
+            /*
+             * Target column ke according UI ko
+             * immediately update karo.
+             */
+            updateTaskCardVisualState(
+                card,
+                targetColumn
+            );
+
+            /*
+             * Counts immediately update.
+             */
+            updateColumnCounts();
+
+            /*
+             * API request background me DB update karegi.
+             */
+            try {
+                const response =
+                    await apiRequest(
+                        replaceTask(
+                            app.dataset
+                                .moveUrlTemplate,
+                            taskId
+                        ),
+                        {
+                            method:
+                                'PATCH',
+
+                            body: {
+                                group_by:
+                                    groupBy.value,
+
+                                target_column:
+                                    targetColumn,
+
+                                before_id:
+                                    previousTaskId(
+                                        card
+                                    ),
+
+                                after_id:
+                                    nextTaskId(
+                                        card
+                                    ),
+                            },
+                        }
+                    );
+
+                const task =
+                    response.task;
+
+                /*
+                 * Server se final values.
+                 */
+                card.dataset.status =
+                    task.status;
+
+                card.dataset.priority =
+                    task.priority;
+
+                /*
+                 * Agar card ke andar status/priority
+                 * visual elements hain to unko bhi
+                 * immediately server response ke according
+                 * update karo.
+                 */
+                updateTaskCardVisualState(
+                    card,
+                    targetColumn,
+                    task
+                );
+
+                lastUndo = {
+                    taskId,
+
+                    card,
+
+                    targetColumn:
+                        snapshot.column,
+
+                    previousColumn:
+                        snapshot.column,
+
+                    snapshot,
+                };
+
+                updateUndoButton();
+
+                showToast(
+                    'Task moved successfully.'
+                );
+            } catch (error) {
+
+                /*
+                 * API fail hone par original position
+                 * restore karo.
+                 */
+                restoreCard(
+                    card,
+                    snapshot
+                );
+
+                if (
+                    error.status === 409
+                ) {
+                    await refreshBoard(
+                        true
+                    );
+                }
+
+                showToast(
+                    error.message,
+                    'error'
+                );
+            } finally {
+
+                /*
+                 * Safety: blur/overlay kabhi stuck
+                 * nahi rehna chahiye.
+                 */
+                card.classList.remove(
+                    'saving'
+                );
+
+                updateColumnCounts();
+            }
+        }
+
+        function restoreColumn() {
+            if (!draggedColumn) {
+                return;
+            }
+
+            if (
+                columnSnapshot?.nextSibling
+                && columnSnapshot.nextSibling
+                    .parentNode
+                === columnSnapshot.parent
+            ) {
+                columnSnapshot.parent.insertBefore(
+                    draggedColumn,
+                    columnSnapshot.nextSibling
+                );
+            } else {
+                columnSnapshot?.parent?.appendChild(
+                    draggedColumn
+                );
+            }
+        }
+
+        function updateUndoButton() {
+            if (!undoButton) {
+                return;
+            }
+
+            undoButton.disabled =
+                !lastUndo;
+        }
+
+        undoButton?.addEventListener(
+            'click',
+            async function () {
+                if (
+                    !lastUndo
+                    || pendingRequests > 0
+                ) {
+                    return;
+                }
+
+                const card =
+                    document.querySelector(
+                        '.task-kanban-card[data-task-id="' +
+                        lastUndo.taskId +
+                        '"]'
+                    );
+
+                if (!card) {
+                    lastUndo = null;
+                    updateUndoButton();
+                    return;
+                }
+
+                const targetList =
+                    document.querySelector(
+                        '.task-kanban-card-list[data-column-slug="' +
+                        CSS.escape(
+                            lastUndo.targetColumn
+                        ) +
+                        '"]'
+                    );
+
+                if (!targetList) {
+                    return;
+                }
+
+                const rollbackSnapshot = {
+                    parent:
+                        card.parentElement,
+
+                    nextSibling:
+                        card.nextElementSibling,
+                };
+
+                targetList.appendChild(
+                    card
+                );
+
+                try {
+                    await apiRequest(
+                        replaceTask(
+                            app.dataset
+                                .moveUrlTemplate,
+                            lastUndo.taskId
+                        ),
+                        {
+                            method:
+                                'PATCH',
+
+                            body: {
+                                group_by:
+                                    groupBy.value,
+
+                                target_column:
+                                    lastUndo
+                                        .targetColumn,
+
+                                before_id:
+                                    null,
+
+                                after_id:
+                                    null,
+                            },
+                        }
+                    );
+
+                    lastUndo = null;
+                    updateUndoButton();
+
+                    showToast(
+                        'Last move undone.'
+                    );
+                } catch (error) {
+                    restoreCard(
+                        card,
+                        rollbackSnapshot
+                    );
+
+                    showToast(
+                        error.message,
+                        'error'
+                    );
+                }
+
+                updateColumnCounts();
+            }
+        );
+
+        document.addEventListener(
+            'click',
+            function (event) {
+                if (
+                    event.target.closest(
+                        '[data-no-drawer]'
+                    )
+                ) {
+                    return;
+                }
+
+                const card =
+                    event.target.closest(
+                        '.task-kanban-card'
+                    );
+
+                if (!card) {
+                    return;
+                }
+
+                openDrawer(card);
+            }
+        );
+
+        document.addEventListener(
+            'keydown',
+            function (event) {
+                if (
+                    event.key === 'Enter'
+                    && event.target.classList.contains(
+                        'task-kanban-card'
+                    )
+                ) {
+                    openDrawer(
+                        event.target
+                    );
+                }
+
+                if (
+                    event.key === 'Escape'
+                ) {
+                    closeDrawer();
+                }
+            }
+        );
+
+        async function openDrawer(card) {
+            const taskId =
+                card.dataset.taskId;
+
+            selectedCard
+                ?.classList.remove(
+                    'selected'
+                );
+
+            selectedCard =
+                card;
+
+            selectedCard.classList.add(
+                'selected'
+            );
+
+            drawerOverlay.classList.add(
+                'open'
+            );
+
+            drawerOverlay.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+
+            drawer.innerHTML =
+                '<div class="task-kanban-drawer-loading">'
+                + 'Loading Task details...'
+                + '</div>';
+
+            try {
+                const response =
+                    await fetch(
+                        replaceTask(
+                            app.dataset
+                                .detailsUrlTemplate,
+                            taskId
+                        ),
+                        {
+                            headers: {
+                                Accept:
+                                    'application/json',
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest',
+                            },
+                        }
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        'Task details could not be loaded.'
+                    );
+                }
+
+                const payload =
+                    await response.json();
+
+                drawer.innerHTML =
+                    payload.html;
+            } catch (error) {
+                drawer.innerHTML =
+                    '<div class="task-kanban-drawer-error">'
+                    + escapeHtml(
+                        error.message
+                    )
+                    + '</div>';
+            }
+        }
+
+        function closeDrawer() {
+            drawerOverlay.classList.remove(
+                'open'
+            );
+
+            drawerOverlay.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
+            selectedCard
+                ?.classList.remove(
+                    'selected'
+                );
+
+            selectedCard = null;
+        }
+
+        document.addEventListener(
+            'click',
+            function (event) {
+                if (
+                    event.target.id
+                    === 'taskKanbanDrawerClose'
+                ) {
+                    closeDrawer();
+                }
+
+                if (
+                    event.target
+                    === drawerOverlay
+                ) {
+                    closeDrawer();
+                }
+            }
+        );
+
+        function escapeHtml(value) {
+            const div =
+                document.createElement(
+                    'div'
+                );
+
+            div.textContent =
+                String(value);
+
+            return div.innerHTML;
+        }
+
+        searchInput?.addEventListener(
+            'input',
+            function () {
+                clearTimeout(
+                    searchTimer
+                );
+
+                searchTimer =
+                    setTimeout(
+                        function () {
+                            refreshBoard();
+                        },
+                        350
+                    );
+            }
+        );
+
+        [
+            groupBy,
+            statusFilter,
+            priorityFilter,
+            dueFilter,
+        ].forEach(
+            function (element) {
+                element?.addEventListener(
+                    'change',
+                    async function () {
+                        if (
+                            element
+                            === groupBy
+                        ) {
+                            try {
+                                await apiRequest(
+                                    app.dataset
+                                        .preferenceUrl,
+                                    {
+                                        method:
+                                            'PATCH',
+
+                                        body: {
+                                            group_by:
+                                                groupBy.value,
+                                        },
+                                    }
+                                );
+                            } catch (error) {
+                                showToast(
+                                    error.message,
+                                    'error'
+                                );
+                            }
+                        }
+
+                        refreshBoard();
+                    }
+                );
+            }
+        );
+
+        hideEmpty?.addEventListener(
+            'change',
+            async function () {
+                try {
+                    await apiRequest(
+                        app.dataset
+                            .preferenceUrl,
+                        {
+                            method:
+                                'PATCH',
+
+                            body: {
+                                hide_empty_columns:
+                                    hideEmpty.checked,
+                            },
+                        }
+                    );
+
+                    refreshBoard();
+                } catch (error) {
+                    showToast(
+                        error.message,
+                        'error'
+                    );
+                }
+            }
+        );
+
+        resetButton?.addEventListener(
+            'click',
+            function () {
+                searchInput.value = '';
+                statusFilter.value = '';
+                priorityFilter.value = '';
+                dueFilter.value = '';
+
+                refreshBoard();
+            }
+        );
+
+        refreshButton?.addEventListener(
+            'click',
+            function () {
+                refreshBoard();
+            }
+        );
+
+        window.addEventListener(
+            'focus',
+            function () {
+                refreshBoard(true);
+            }
+        );
+
+        document.addEventListener(
+            'visibilitychange',
+            function () {
+                if (
+                    document.visibilityState
+                    === 'visible'
+                ) {
+                    refreshBoard(true);
+                }
+            }
+        );
+
+        refreshTimer =
+            setInterval(
+                function () {
+                    if (
+                        document.visibilityState
+                        === 'visible'
+                    ) {
+                        refreshBoard(true);
+                    }
+                },
+                45000
+            );
+
+        updateUndoButton();
+    }
+);

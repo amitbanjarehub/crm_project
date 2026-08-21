@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use App\Modules\Lead\Support\AuthorizesLeadAccess;
 use App\Modules\Lead\Models\LeadPriority;
 use App\Modules\Lead\Models\LeadStatus;
+use App\Support\LeadReturnUrl;
 
 class LeadController extends Controller
 {
@@ -133,6 +134,12 @@ class LeadController extends Controller
 
     public function create(Request $request)
     {
+
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         $canAssign = $this->canAssignLeads(
             $request->user()
         );
@@ -173,11 +180,19 @@ class LeadController extends Controller
 
             'pageTitle' =>
                 'Add Lead',
+
+            'returnUrl' => $returnUrl,
         ]);
     }
 
     public function store(Request $request)
     {
+
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         $canAssign = $this->canAssignLeads(
             $request->user()
         );
@@ -228,9 +243,16 @@ class LeadController extends Controller
                 $nextFollowUpAt,
         ]);
 
+        // return redirect()
+        //     ->route('lead.index')
+        //     ->with('success', 'Lead added successfully.');
+
         return redirect()
-            ->route('lead.index')
-            ->with('success', 'Lead added successfully.');
+            ->to($returnUrl)
+            ->with(
+                'success',
+                'Lead added successfully.'
+            );
     }
 
     public function show(
@@ -240,6 +262,11 @@ class LeadController extends Controller
         $this->ensureCanAccessLead(
             $request->user(),
             $lead
+        );
+
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
         );
 
         $lead->load([
@@ -261,6 +288,7 @@ class LeadController extends Controller
             'statuses' => Lead::statuses(),
             'priorities' => Lead::priorities(),
             'sources' => Lead::sources(),
+            'returnUrl' => $returnUrl,
             'followUpTypes' =>
                 \App\Modules\FollowUp\Models\FollowUp::types(),
             'followUpOutcomes' =>
@@ -276,9 +304,23 @@ class LeadController extends Controller
             $lead
         );
 
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         if ($lead->isConverted()) {
             return redirect()
-                ->route('lead.show', $lead->id)
+                ->route(
+                    'lead.show',
+                    [
+                        'lead' =>
+                            $lead->id,
+
+                        'return_url' =>
+                            $returnUrl,
+                    ]
+                )
                 ->with(
                     'error',
                     'Converted lead ko Lead module se edit nahi kiya ja sakta. Client record edit karein.'
@@ -346,14 +388,20 @@ class LeadController extends Controller
             'users' => $users,
             'canAssign' => $canAssign,
             // 'statuses' => Lead::statuses(),
-            'statuses' => Lead::editableStatuses(),
-            'priorities' => Lead::priorities(),
+            // 'statuses' => Lead::editableStatuses(),
+            // 'priorities' => Lead::priorities(),
+            'statuses' =>
+                $statuses,
+
+            'priorities' =>
+                $priorities,
             'defaultStatus' =>
                 Lead::defaultStatus(),
 
             'defaultPriority' =>
                 Lead::defaultPriority(),
             'sources' => Lead::sources(),
+            'returnUrl' => $returnUrl,
             'pageTitle' => 'Edit Lead',
         ]);
     }
@@ -365,6 +413,11 @@ class LeadController extends Controller
         $this->ensureCanAccessLead(
             $request->user(),
             $lead
+        );
+
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
         );
 
         if ($lead->isConverted()) {
@@ -429,8 +482,11 @@ class LeadController extends Controller
         ]);
 
         return redirect()
-            ->route('lead.index')
-            ->with('success', 'Lead updated successfully.');
+            ->to($returnUrl)
+            ->with(
+                'success',
+                'Lead updated successfully.'
+            );
     }
 
     public function updateStatus(
@@ -442,12 +498,17 @@ class LeadController extends Controller
             $lead
         );
 
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         if ($lead->isConverted()) {
             return redirect()
-                ->route('lead.index')
+                ->to($returnUrl)
                 ->with(
                     'error',
-                    'Converted lead status manually change nahi kiya ja sakta.'
+                    'Converted lead status manually can not be changed.'
                 );
         }
 
@@ -484,7 +545,7 @@ class LeadController extends Controller
 
 
         return redirect()
-            ->route('lead.index')
+            ->to($returnUrl)
             ->with('success', 'Lead status updated successfully.');
     }
 
@@ -497,9 +558,14 @@ class LeadController extends Controller
             $lead
         );
 
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         if ($lead->isConverted()) {
             return redirect()
-                ->route('lead.index')
+                ->to($returnUrl)
                 ->with(
                     'error',
                     'Converted lead cannot be deleted.'
@@ -509,7 +575,7 @@ class LeadController extends Controller
         $lead->delete();
 
         return redirect()
-            ->route('lead.index')
+             ->to($returnUrl)
             ->with('success', 'Lead deleted successfully.');
     }
 

@@ -773,12 +773,19 @@ class TaskController extends Controller
             );
         }
 
+        // return redirect()
+        //     ->route('task.show', $task->id)
+        //     ->with(
+        //         'success',
+        //         'Task updated successfully.'
+        //     );
+
         return redirect()
-            ->route('task.show', $task->id)
-            ->with(
-                'success',
-                'Task updated successfully.'
-            );
+            ->route('task.show', [
+                'task' => $task->id,
+                'from' => $request->input('from'),
+            ])
+            ->with('success', 'Task updated successfully.');
     }
 
 

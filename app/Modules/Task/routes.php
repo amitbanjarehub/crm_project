@@ -6,6 +6,7 @@ use App\Modules\Task\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 use App\Modules\Task\Controllers\TaskDependencyController;
 use App\Modules\Task\Controllers\TaskImportExportController;
+use App\Modules\Task\Controllers\TaskKanbanController;
 
 Route::get('/', [TaskController::class, 'index'])
     ->middleware('permission:tasks.view')
@@ -69,6 +70,84 @@ Route::get(
         'permission:tasks.export'
     )
     ->name('export');
+
+/*
+|--------------------------------------------------------------------------
+| Task Kanban Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/kanban',
+    [
+        TaskKanbanController::class,
+        'index',
+    ]
+)
+    ->middleware(
+        'permission:tasks.view'
+    )
+    ->name('kanban.index');
+
+Route::get(
+    '/kanban/board',
+    [
+        TaskKanbanController::class,
+        'board',
+    ]
+)
+    ->middleware(
+        'permission:tasks.view'
+    )
+    ->name('kanban.board');
+
+Route::get(
+    '/kanban/tasks/{task}/details',
+    [
+        TaskKanbanController::class,
+        'details',
+    ]
+)
+    ->middleware(
+        'permission:tasks.view'
+    )
+    ->name('kanban.details');
+
+Route::patch(
+    '/kanban/tasks/{task}/move',
+    [
+        TaskKanbanController::class,
+        'move',
+    ]
+)
+    ->middleware(
+        'permission:tasks.update_status'
+    )
+    ->name('kanban.move');
+
+Route::put(
+    '/kanban/column-order',
+    [
+        TaskKanbanController::class,
+        'saveColumnOrder',
+    ]
+)
+    ->middleware(
+        'permission:tasks.view'
+    )
+    ->name('kanban.column-order');
+
+Route::patch(
+    '/kanban/preference',
+    [
+        TaskKanbanController::class,
+        'savePreference',
+    ]
+)
+    ->middleware(
+        'permission:tasks.view'
+    )
+    ->name('kanban.preference');
 
 Route::get('/service/{projectService}/create', [
     TaskController::class,

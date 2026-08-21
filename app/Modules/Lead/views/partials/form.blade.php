@@ -14,8 +14,8 @@
     $selectedStatus = old(
         'status',
         $isEdit
-            ? $lead->status
-            : $defaultStatus
+        ? $lead->status
+        : $defaultStatus
     );
 
     /*
@@ -31,8 +31,8 @@
     $selectedPriority = old(
         'priority',
         $isEdit
-            ? $lead->priority
-            : $defaultPriority
+        ? $lead->priority
+        : $defaultPriority
     );
 
     /*
@@ -58,17 +58,19 @@
     }
 @endphp
 
-<form
-    action="{{ $isEdit
-        ? route(
-            'lead.update',
-            $lead->id
-        )
-        : route('lead.store') }}"
-    method="POST"
-    class="lead-form"
->
+<form action="{{ $isEdit
+    ? route(
+        'lead.update',
+        $lead->id
+    )
+    : route('lead.store') }}" method="POST" class="lead-form">
     @csrf
+
+    <input type="hidden" name="return_url" value="{{ old(
+    'return_url',
+    $returnUrl
+    ?? route('lead.index')
+) }}">
 
     @if($isEdit)
         @method('PUT')
@@ -84,17 +86,10 @@
                 <span>*</span>
             </label>
 
-            <input
-                type="text"
-                id="name"
-                name="name"
-                value="{{ old(
-                    'name',
-                    $lead->name ?? ''
-                ) }}"
-                placeholder="Enter lead name"
-                required
-            >
+            <input type="text" id="name" name="name" value="{{ old(
+    'name',
+    $lead->name ?? ''
+) }}" placeholder="Enter lead name" required>
 
         </div>
 
@@ -106,17 +101,10 @@
                 <span>*</span>
             </label>
 
-            <input
-                type="text"
-                id="phone"
-                name="phone"
-                value="{{ old(
-                    'phone',
-                    $lead->phone ?? ''
-                ) }}"
-                placeholder="Enter phone number"
-                required
-            >
+            <input type="text" id="phone" name="phone" value="{{ old(
+    'phone',
+    $lead->phone ?? ''
+) }}" placeholder="Enter phone number" required>
 
         </div>
 
@@ -127,16 +115,10 @@
                 Email Address
             </label>
 
-            <input
-                type="email"
-                id="email"
-                name="email"
-                value="{{ old(
-                    'email',
-                    $lead->email ?? ''
-                ) }}"
-                placeholder="Enter email address"
-            >
+            <input type="email" id="email" name="email" value="{{ old(
+    'email',
+    $lead->email ?? ''
+) }}" placeholder="Enter email address">
 
         </div>
 
@@ -147,16 +129,10 @@
                 Company Name
             </label>
 
-            <input
-                type="text"
-                id="company"
-                name="company"
-                value="{{ old(
-                    'company',
-                    $lead->company ?? ''
-                ) }}"
-                placeholder="Enter company name"
-            >
+            <input type="text" id="company" name="company" value="{{ old(
+    'company',
+    $lead->company ?? ''
+) }}" placeholder="Enter company name">
 
         </div>
 
@@ -168,24 +144,17 @@
                 <span>*</span>
             </label>
 
-            <select
-                id="source"
-                name="source"
-                required
-            >
+            <select id="source" name="source" required>
                 @foreach(
-                    $sources
-                    as $sourceKey => $sourceLabel
-                )
-                    <option
-                        value="{{ $sourceKey }}"
-                        @selected(
-                            old(
-                                'source',
-                                $lead->source ?? 'other'
-                            ) === $sourceKey
-                        )
-                    >
+                        $sources
+                        as $sourceKey => $sourceLabel
+                    )
+                    <option value="{{ $sourceKey }}" @selected(
+                        old(
+                            'source',
+                            $lead->source ?? 'other'
+                        ) === $sourceKey
+                    )>
                         {{ $sourceLabel }}
                     </option>
                 @endforeach
@@ -201,22 +170,15 @@
                 <span>*</span>
             </label>
 
-            <select
-                id="status"
-                name="status"
-                required
-            >
+            <select id="status" name="status" required>
                 @foreach(
-                    $statuses
-                    as $statusKey => $statusLabel
-                )
-                    <option
-                        value="{{ $statusKey }}"
-                        @selected(
-                            $selectedStatus
-                                === $statusKey
-                        )
-                    >
+                        $statuses
+                        as $statusKey => $statusLabel
+                    )
+                    <option value="{{ $statusKey }}" @selected(
+                        $selectedStatus
+                        === $statusKey
+                    )>
                         {{ $statusLabel }}
                     </option>
                 @endforeach
@@ -232,22 +194,15 @@
                 <span>*</span>
             </label>
 
-            <select
-                id="priority"
-                name="priority"
-                required
-            >
+            <select id="priority" name="priority" required>
                 @foreach(
-                    $priorities
-                    as $priorityKey => $priorityLabel
-                )
-                    <option
-                        value="{{ $priorityKey }}"
-                        @selected(
-                            $selectedPriority
-                                === $priorityKey
-                        )
-                    >
+                        $priorities
+                        as $priorityKey => $priorityLabel
+                    )
+                    <option value="{{ $priorityKey }}" @selected(
+                        $selectedPriority
+                        === $priorityKey
+                    )>
                         {{ $priorityLabel }}
                     </option>
                 @endforeach
@@ -264,27 +219,21 @@
                     Assign To
                 </label>
 
-                <select
-                    id="assigned_to"
-                    name="assigned_to"
-                >
+                <select id="assigned_to" name="assigned_to">
                     <option value="">
                         Unassigned
                     </option>
 
                     @foreach($users as $user)
 
-                        <option
-                            value="{{ $user->id }}"
-                            @selected(
-                                (string) old(
-                                    'assigned_to',
-                                    $lead->assigned_to ?? ''
-                                )
-                                ===
-                                (string) $user->id
+                        <option value="{{ $user->id }}" @selected(
+                            (string) old(
+                                'assigned_to',
+                                $lead->assigned_to ?? ''
                             )
-                        >
+                            ===
+                            (string) $user->id
+                        )>
                             {{ $user->name }}
                             ({{ $user->email }})
 
@@ -321,12 +270,7 @@
                 Next Follow-up
             </label>
 
-            <input
-                type="datetime-local"
-                id="next_follow_up_at"
-                name="next_follow_up_at"
-                value="{{ $followUpValue }}"
-            >
+            <input type="datetime-local" id="next_follow_up_at" name="next_follow_up_at" value="{{ $followUpValue }}">
 
         </div>
 
@@ -337,15 +281,11 @@
                 Lead Notes
             </label>
 
-            <textarea
-                id="notes"
-                name="notes"
-                rows="5"
-                placeholder="Enter lead requirement, conversation or other notes"
-            >{{ old(
-                'notes',
-                $lead->notes ?? ''
-            ) }}</textarea>
+            <textarea id="notes" name="notes" rows="5"
+                placeholder="Enter lead requirement, conversation or other notes">{{ old(
+    'notes',
+    $lead->notes ?? ''
+) }}</textarea>
 
         </div>
 
@@ -354,19 +294,18 @@
     {{-- Form Actions --}}
     <div class="form-actions">
 
-        <button
-            type="submit"
-            class="primary-btn"
-        >
+        <button type="submit" class="primary-btn">
             {{ $isEdit
-                ? 'Update Lead'
-                : 'Save Lead' }}
+    ? 'Update Lead'
+    : 'Save Lead' }}
         </button>
 
-        <a
-            href="{{ route('lead.index') }}"
-            class="cancel-btn"
-        >
+        <!-- <a href="{{ route('lead.index') }}" class="cancel-btn">
+            Cancel
+        </a> -->
+
+        <a href="{{ $returnUrl
+           ?? route('lead.index') }}" class="cancel-btn">
             Cancel
         </a>
 

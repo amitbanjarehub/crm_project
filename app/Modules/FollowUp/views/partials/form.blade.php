@@ -4,26 +4,28 @@
     $followedUpValue = old(
         'followed_up_at',
         $isEdit && $followUp->followed_up_at
-            ? $followUp->followed_up_at->format('Y-m-d\TH:i')
-            : now()->format('Y-m-d\TH:i')
+        ? $followUp->followed_up_at->format('Y-m-d\TH:i')
+        : now()->format('Y-m-d\TH:i')
     );
 
     $nextFollowUpValue = old(
         'next_follow_up_at',
         $isEdit && $followUp->next_follow_up_at
-            ? $followUp->next_follow_up_at->format('Y-m-d\TH:i')
-            : ''
+        ? $followUp->next_follow_up_at->format('Y-m-d\TH:i')
+        : ''
     );
 @endphp
 
-<form
-    action="{{ $isEdit
-        ? route('followup.update', $followUp->id)
-        : route('followup.store', $lead->id) }}"
-    method="POST"
-    class="followup-form"
->
+<form action="{{ $isEdit
+    ? route('followup.update', $followUp->id)
+    : route('followup.store', $lead->id) }}" method="POST" class="followup-form">
     @csrf
+
+    <input type="hidden" name="return_url" value="{{ old(
+    'return_url',
+    $returnUrl
+    ?? route('lead.index')
+) }}">
 
     @if ($isEdit)
         @method('PUT')
@@ -42,15 +44,12 @@
 
             <select id="type" name="type" required>
                 @foreach($types as $key => $label)
-                    <option
-                        value="{{ $key }}"
-                        @selected(
-                            old(
-                                'type',
-                                $followUp->type ?? 'call'
-                            ) === $key
-                        )
-                    >
+                    <option value="{{ $key }}" @selected(
+                        old(
+                            'type',
+                            $followUp->type ?? 'call'
+                        ) === $key
+                    )>
                         {{ $label }}
                     </option>
                 @endforeach
@@ -62,13 +61,8 @@
                 Follow-up Date & Time *
             </label>
 
-            <input
-                type="datetime-local"
-                id="followed_up_at"
-                name="followed_up_at"
-                value="{{ $followedUpValue }}"
-                required
-            >
+            <input type="datetime-local" id="followed_up_at" name="followed_up_at" value="{{ $followedUpValue }}"
+                required>
         </div>
 
         <div class="form-group">
@@ -76,15 +70,12 @@
 
             <select id="outcome" name="outcome" required>
                 @foreach($outcomes as $key => $label)
-                    <option
-                        value="{{ $key }}"
-                        @selected(
-                            old(
-                                'outcome',
-                                $followUp->outcome ?? 'interested'
-                            ) === $key
-                        )
-                    >
+                    <option value="{{ $key }}" @selected(
+                        old(
+                            'outcome',
+                            $followUp->outcome ?? 'interested'
+                        ) === $key
+                    )>
                         {{ $label }}
                     </option>
                 @endforeach
@@ -96,24 +87,15 @@
                 Next Follow-up
             </label>
 
-            <input
-                type="datetime-local"
-                id="next_follow_up_at"
-                name="next_follow_up_at"
-                value="{{ $nextFollowUpValue }}"
-            >
+            <input type="datetime-local" id="next_follow_up_at" name="next_follow_up_at"
+                value="{{ $nextFollowUpValue }}">
         </div>
 
         <div class="form-group full-width">
             <label for="notes">Discussion Notes *</label>
 
-            <textarea
-                id="notes"
-                name="notes"
-                rows="6"
-                required
-                placeholder="What was discussed with the lead?"
-            >{{ old('notes', $followUp->notes ?? '') }}</textarea>
+            <textarea id="notes" name="notes" rows="6" required
+                placeholder="What was discussed with the lead?">{{ old('notes', $followUp->notes ?? '') }}</textarea>
         </div>
 
     </div>
@@ -123,10 +105,12 @@
             {{ $isEdit ? 'Update Follow-up' : 'Save Follow-up' }}
         </button>
 
-        <a
-            href="{{ route('lead.show', $lead->id) }}"
-            class="cancel-btn"
-        >
+        <!-- <a href="{{ route('lead.show', $lead->id) }}" class="cancel-btn">
+            Cancel
+        </a> -->
+
+        <a href="{{ $returnUrl
+    ?? route('lead.index') }}" class="cancel-btn">
             Cancel
         </a>
     </div>

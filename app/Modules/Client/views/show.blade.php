@@ -22,35 +22,39 @@
             </div>
 
             <!-- <div class="client-actions">
-                <a href="{{ route('client.index') }}" class="secondary-btn">
-                    Back
-                </a>
+                        <a href="{{ route('client.index') }}" class="secondary-btn">
+                            Back
+                        </a>
 
-                @if(auth()->user()->hasPermission('clients.edit'))
-                    <a
-                        href="{{ route('client.edit', $client->id) }}"
-                        class="primary-btn"
-                    >
-                        Edit Client
-                    </a>
-                @endif
+                        @if(auth()->user()->hasPermission('clients.edit'))
+                            <a
+                                href="{{ route('client.edit', $client->id) }}"
+                                class="primary-btn"
+                            >
+                                Edit Client
+                            </a>
+                        @endif
 
-                @if(
-                    $client->lead
-                    && auth()->user()->hasPermission('leads.view')
-                )
-                    <a
-                        href="{{ route('lead.show', $client->lead_id) }}"
-                        class="secondary-btn"
-                    >
-                        Origin Lead
-                    </a>
-                @endif
-            </div> -->
+                        @if(
+                            $client->lead
+                            && auth()->user()->hasPermission('leads.view')
+                        )
+                            <a
+                                href="{{ route('lead.show', $client->lead_id) }}"
+                                class="secondary-btn"
+                            >
+                                Origin Lead
+                            </a>
+                        @endif
+                    </div> -->
 
             <div class="client-actions">
 
-                <a href="{{ route('client.index') }}" class="secondary-btn">
+                <!-- <a href="{{ route('client.index') }}" class="secondary-btn">
+                            Back
+                        </a> -->
+
+                <a href="{{ $returnUrl }}" class="secondary-btn">
                     Back
                 </a>
 
@@ -79,12 +83,25 @@
                 @endif
 
                 @if(
-                        $client->lead
-                        && auth()->user()->hasPermission('leads.view')
-                    )
-                    <a href="{{ route('lead.show', $client->lead_id) }}" class="secondary-btn">
-                        Origin Lead
-                    </a>
+                                $client->lead
+                                && auth()->user()->hasPermission('leads.view')
+                            )
+                            <!-- <a href="{{ route('lead.show', $client->lead_id) }}" class="secondary-btn">
+                                        Origin Lead
+                                    </a> -->
+
+                            <a href="{{ route(
+                        'lead.show',
+                        [
+                            'lead' =>
+                                $client->lead_id,
+
+                            'return_url' =>
+                                $returnUrl,
+                        ]
+                    ) }}" class="secondary-btn">
+                                Origin Lead
+                            </a>
                 @endif
 
             </div>

@@ -1321,3 +1321,309 @@ Isliye yahan position fixed hona zaroori hai.
     overflow-y: auto;
     scrollbar-width: thin;
 }
+
+/* =========================================================
+   SIDEBAR GROUPS / SUBMENUS
+========================================================= */
+
+.sidebar-menu {
+    padding: 20px 14px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Main direct links
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-main-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    width: 100%;
+
+    padding: 13px 16px;
+
+    color: #cbd5e1;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    margin-bottom: 6px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.sidebar-main-link:hover {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.sidebar-main-link.active {
+    background: var(--crm-primary, #2563eb);
+    color: #ffffff;
+
+    box-shadow:
+        0 10px 20px
+        rgba(37, 99, 235, 0.35);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Group
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-menu-group {
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Parent Button
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-group-toggle {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 13px 16px;
+
+    border: 0;
+    border-radius: 12px;
+
+    background: transparent;
+
+    color: #cbd5e1;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.sidebar-group-toggle:hover {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.sidebar-group-toggle.active {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Parent Left Side
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-group-left {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Icons
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-menu-icon {
+    width: 20px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    font-size: 16px;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Labels
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-menu-label {
+    white-space: nowrap;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Chevron
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-chevron {
+    width: 18px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+.sidebar-group-toggle[aria-expanded="true"]
+.sidebar-chevron {
+    transform: rotate(180deg);
+    color: #ffffff;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Submenu
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-submenu {
+    padding: 5px 0 4px 18px;
+
+    border-left:
+        1px solid #1e293b;
+
+    margin-left: 18px;
+
+    animation:
+        sidebarSubmenuOpen
+        0.18s ease;
+}
+
+.sidebar-submenu[hidden] {
+    display: none;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Submenu Links
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-submenu-link {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    padding: 10px 13px;
+
+    margin-bottom: 3px;
+
+    border-radius: 9px;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.sidebar-submenu-link:hover {
+    background: #0f172a;
+
+    color: #ffffff;
+
+    transform: translateX(2px);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Active Submenu
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-submenu-link.active {
+    background:
+        var(--crm-primary, #2563eb);
+
+    color: #ffffff;
+
+    box-shadow:
+        0 7px 15px
+        rgba(37, 99, 235, 0.25);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Parent Active Indicator
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-menu-group.is-active
+.sidebar-group-toggle {
+    color: #ffffff;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Animation
+|--------------------------------------------------------------------------
+*/
+
+@keyframes sidebarSubmenuOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

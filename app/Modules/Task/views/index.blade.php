@@ -24,35 +24,35 @@
 
         <!-- <div class="page-card-header">
 
-            <div>
-                <h1>Task Management</h1>
+                <div>
+                    <h1>Task Management</h1>
 
-                <p>
-                    View all tasks available according to your access.
-                </p>
-            </div>
+                    <p>
+                        View all tasks available according to your access.
+                    </p>
+                </div>
 
-            <div class="task-header-actions">
+                <div class="task-header-actions">
 
-                <a
-                    href="{{ route('task.my') }}"
-                    class="secondary-btn"
-                >
-                    My Tasks
-                </a>
-
-                @if(auth()->user()->hasPermission('projects.view'))
                     <a
-                        href="{{ route('project.index') }}"
-                        class="primary-btn"
+                        href="{{ route('task.my') }}"
+                        class="secondary-btn"
                     >
-                        Open Projects
+                        My Tasks
                     </a>
-                @endif
 
-            </div>
+                    @if(auth()->user()->hasPermission('projects.view'))
+                        <a
+                            href="{{ route('project.index') }}"
+                            class="primary-btn"
+                        >
+                            Open Projects
+                        </a>
+                    @endif
 
-        </div> -->
+                </div>
+
+            </div> -->
 
         <div class="page-card-header">
 
@@ -66,6 +66,10 @@
             </div>
 
             <div class="task-header-actions">
+
+                <a href="{{ route('task.kanban.index') }}" class="secondary-btn">
+                    ▦ Kanban View
+                </a>
 
                 @if(
                                 auth()->user()->hasPermission(

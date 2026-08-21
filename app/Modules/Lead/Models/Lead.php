@@ -28,11 +28,23 @@ class Lead extends Model
         'notes',
         'converted_at',
         'converted_by',
+        'status_kanban_position',
+        'priority_kanban_position',
+        'kanban_version',
     ];
 
     protected $casts = [
         'next_follow_up_at' => 'datetime',
         'converted_at' => 'datetime',
+
+        'status_kanban_position' =>
+            'decimal:6',
+
+        'priority_kanban_position' =>
+            'decimal:6',
+
+        'kanban_version' =>
+            'integer',
     ];
 
     /*
@@ -289,7 +301,7 @@ class Lead extends Model
         ) {
             return (bool) $this
                 ->statusDefinition
-                ?->is_closed;
+                    ?->is_closed;
         }
 
         return LeadStatus::query()
@@ -322,7 +334,7 @@ class Lead extends Model
             )
             && $this
                 ->statusDefinition
-                ?->system_key === 'converted'
+                    ?->system_key === 'converted'
         ) {
             return true;
         }
@@ -337,7 +349,7 @@ class Lead extends Model
         if (
             $convertedStatus
             && $this->status
-                === $convertedStatus
+            === $convertedStatus
         ) {
             return true;
         }

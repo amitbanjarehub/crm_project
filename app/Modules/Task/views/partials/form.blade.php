@@ -47,6 +47,7 @@
 
     @if ($isEdit)
         @method('PUT')
+        <input type="hidden" name="from" value="{{ request('from') }}">
     @endif
 
     <div class="task-context-card">
@@ -246,12 +247,18 @@
             {{ $isEdit ? 'Update Task' : 'Save Task' }}
         </button>
 
-        <a href="{{ $isEdit
+        <!-- <a href="{{ $isEdit
     ? route('task.show', $task->id)
     : route('project.show', $project->id) }}" class="cancel-btn">
             Cancel
-        </a>
+        </a> -->
 
+
+        <a href="{{ $isEdit
+    ? route('task.show', ['task' => $task->id, 'from' => request('from')])
+    : route('project.show', $project->id) }}" class="cancel-btn">
+            Cancel
+        </a>
     </div>
 
 </form>

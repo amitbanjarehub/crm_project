@@ -11,6 +11,7 @@ use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Lead\Models\LeadStatus;
+use App\Support\LeadReturnUrl;
 
 class LeadConversionController extends Controller
 {
@@ -20,6 +21,12 @@ class LeadConversionController extends Controller
         Request $request,
         Lead $lead
     ) {
+
+        $returnUrl = LeadReturnUrl::resolve(
+            $request,
+            route('lead.index')
+        );
+
         $this->ensureCanAccessLead(
             $request->user(),
             $lead
@@ -94,13 +101,34 @@ class LeadConversionController extends Controller
             );
         } catch (DomainException $exception) {
             return redirect()
-                ->route('lead.show', $lead->id)
-                ->with('error', $exception->getMessage());
+                ->route(
+                    'lead.show',
+                    [
+                        'lead' =>
+                            $lead->id,
+
+                        'return_url' =>
+                            $returnUrl,
+                    ]
+                )
+                ->with(
+                    'error',
+                    $exception->getMessage()
+                );
         }
 
         if ($request->user()->hasPermission('clients.view')) {
             return redirect()
-                ->route('client.show', $client->id)
+                ->route(
+                    'client.show',
+                    [
+                        'client' =>
+                            $client->id,
+
+                        'return_url' =>
+                            $returnUrl,
+                    ]
+                )
                 ->with(
                     'success',
                     'Lead converted into client successfully.'
@@ -108,7 +136,16 @@ class LeadConversionController extends Controller
         }
 
         return redirect()
-            ->route('lead.show', $lead->id)
+            ->route(
+                'lead.show',
+                [
+                    'lead' =>
+                        $lead->id,
+
+                    'return_url' =>
+                        $returnUrl,
+                ]
+            )
             ->with(
                 'success',
                 'Lead converted into client successfully.'

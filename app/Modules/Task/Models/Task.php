@@ -38,6 +38,8 @@ class Task extends Model
         'due_at',
         'estimated_hours',
         'completed_at',
+        'status_kanban_position',
+        'priority_kanban_position',
     ];
 
     protected $casts = [

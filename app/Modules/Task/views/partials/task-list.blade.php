@@ -12,6 +12,10 @@
         || $status !== ''
         || $priority !== ''
         || $due !== '';
+
+
+    $fromParam = $onlyMyTasks ? 'my' : 'index';
+
 @endphp
 
 {{-- Task Filters --}}
@@ -103,38 +107,38 @@
             @forelse($tasks as $key => $task)
 
                         <!-- @php
-                                                                $isOverdue =
-                                                                    $task->due_at
-                                                                    && $task->due_at->isPast()
-                                                                    && !in_array(
-                                                                        $task->status,
-                                                                        [
-                                                                            'completed',
-                                                                            'cancelled',
-                                                                        ],
-                                                                        true
-                                                                    );
+                                                                                                    $isOverdue =
+                                                                                                        $task->due_at
+                                                                                                        && $task->due_at->isPast()
+                                                                                                        && !in_array(
+                                                                                                            $task->status,
+                                                                                                            [
+                                                                                                                'completed',
+                                                                                                                'cancelled',
+                                                                                                            ],
+                                                                                                            true
+                                                                                                        );
 
-                                                                $isDueToday =
-                                                                    $task->due_at
-                                                                    && $task->due_at->isToday()
-                                                                    && !in_array(
-                                                                        $task->status,
-                                                                        [
-                                                                            'completed',
-                                                                            'cancelled',
-                                                                        ],
-                                                                        true
-                                                                    );
+                                                                                                    $isDueToday =
+                                                                                                        $task->due_at
+                                                                                                        && $task->due_at->isToday()
+                                                                                                        && !in_array(
+                                                                                                            $task->status,
+                                                                                                            [
+                                                                                                                'completed',
+                                                                                                                'cancelled',
+                                                                                                            ],
+                                                                                                            true
+                                                                                                        );
 
-                                                                $pendingDependencyCount =
-                                                                    $task->prerequisiteTasks
-                                                                        ->where('status', '!=', 'completed')
-                                                                        ->count();
+                                                                                                    $pendingDependencyCount =
+                                                                                                        $task->prerequisiteTasks
+                                                                                                            ->where('status', '!=', 'completed')
+                                                                                                            ->count();
 
-                                                                $totalDependencyCount =
-                                                                    $task->prerequisiteTasks->count();
-                                                            @endphp -->
+                                                                                                    $totalDependencyCount =
+                                                                                                        $task->prerequisiteTasks->count();
+                                                                                                @endphp -->
 
                         @php
                             /*
@@ -271,8 +275,9 @@
 
                             {{-- Dynamic Priority --}}
                             <td>
-                                <span class="dynamic-task-option-badge" style="--task-option-color:
-                                                                           {{ $priorityColor }}">
+                                <span class="dynamic-task-option-badge"
+                                    style="--task-option-color:
+                                                                                                               {{ $priorityColor }}">
                                     {{ $priorityLabel }}
                                 </span>
                             </td>
@@ -281,7 +286,7 @@
                             {{-- Dynamic Status --}}
                             <td>
                                 <span class="dynamic-task-option-badge" style="--task-option-color:
-                                    {{ $statusColor }}">
+                                                                        {{ $statusColor }}">
                                     {{ $statusLabel }}
                                 </span>
                             </td>
@@ -394,29 +399,34 @@
 
                             {{-- Actions --}}
                             <!-- <td>
-                                                                                        <div class="task-row-actions">
+                                                                                                                            <div class="task-row-actions">
 
-                                                                                            <a href="{{ route('task.show', $task->id) }}" class="table-btn view">
-                                                                                                View
-                                                                                            </a>
+                                                                                                                                <a href="{{ route('task.show', $task->id) }}" class="table-btn view">
+                                                                                                                                    View
+                                                                                                                                </a>
 
-                                                                                            @if(
-                                                                                                    auth()->user()->hasPermission('tasks.edit')
-                                                                                                    && !$task->isClosed()
-                                                                                                )
-                                                                                                <a href="{{ route('task.edit', $task->id) }}" class="table-btn edit">
-                                                                                                    Edit
-                                                                                                </a>
-                                                                                            @endif
+                                                                                                                                @if(
+                                                                                                                                        auth()->user()->hasPermission('tasks.edit')
+                                                                                                                                        && !$task->isClosed()
+                                                                                                                                    )
+                                                                                                                                    <a href="{{ route('task.edit', $task->id) }}" class="table-btn edit">
+                                                                                                                                        Edit
+                                                                                                                                    </a>
+                                                                                                                                @endif
 
-                                                                                        </div>
-                                                                                    </td> -->
+                                                                                                                            </div>
+                                                                                                                        </td> -->
 
                             {{-- Actions --}}
                             <td>
                                 <div class="task-row-actions">
 
-                                    <a href="{{ route('task.show', $task->id) }}" class="table-btn view">
+                                    <!-- <a href="{{ route('task.show', $task->id) }}" class="table-btn view">
+                                                                View
+                                                            </a> -->
+
+                                    <a href="{{ route('task.show', ['task' => $task->id, 'from' => $fromParam]) }}"
+                                        class="table-btn view">
                                         View
                                     </a>
 
@@ -446,7 +456,12 @@
                                             auth()->user()->hasPermission('tasks.edit')
                                             && !$task->isClosed()
                                         )
-                                        <a href="{{ route('task.edit', $task->id) }}" class="table-btn edit">
+                                        <!-- <a href="{{ route('task.edit', $task->id) }}" class="table-btn edit">
+                                                            Edit
+                                                        </a> -->
+
+                                        <a href="{{ route('task.edit', ['task' => $task->id, 'from' => $fromParam]) }}"
+                                            class="table-btn edit">
                                             Edit
                                         </a>
                                     @endif
@@ -459,8 +474,8 @@
                                             $task->id
                                         ) }}" class="task-inline-delete-form"
                                                             onsubmit="return confirm(
-                                                                                                                                                                                                            'Are you sure you want to delete this task? This action will move the task to Trash.'
-                                                                                                                                                                                                        );">
+                                                                                                                                                                                                                                                                                                            'Are you sure you want to delete this task? This action will move the task to Trash.'
+                                                                                                                                                                                                                                                                                                        );">
                                                             @csrf
                                                             @method('DELETE')
 
